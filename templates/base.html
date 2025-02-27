@@ -5,15 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LITReview{% endblock %}</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'listings/style.css' %}">
 </head>
-<body>
+<body class="text-gray-800 flex flex-col min-h-screen">
 
-    {% include "navbar.html" %} <!-- Inclusion de la navbar -->
+    <!-- NAVBAR -->
+    {% include "navbar.html" %}
 
-    <div class="container">
+    <!-- CONTENU PRINCIPAL -->
+    <main class="flex-grow  mx-auto max-w-4xl px-4 py-6 ">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- FOOTER -->
+    {% include "footer.html" %}
 
 </body>
 </html>

@@ -3,20 +3,21 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        <div class="nav-links">
-          <p>Page d'accueil</p>
+        <div class="text-center mt-10 text-lg font-semibold text-gray-700">
+            <p>Page d'accueil</p>
         </div>
     {% else %}
-      <!-- MESSAGE DE BIENVENUE -->
-  {% include "welcome_massage.html" %}
-      <div class="home-container">
-        <!-- SECTION GAUCHE : BANNIÈRE -->
-{% include "signup_banner.html" %}
+        <!-- MESSAGE DE BIENVENUE -->
+        {% include "welcome_massage.html" %}
 
-        <!-- SECTION DROITE : FORMULAIRE DE CONNEXION -->
+        <div class="container mx-auto px-4 mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
 
-            {% include "login.html" %}
+            <!-- SECTION GAUCHE : BANNIÈRE -->
+            {% include "signup_banner.html" %}
 
-      </div>
+            <!-- SECTION DROITE : FORMULAIRE DE CONNEXION -->
+             {% include "login_form.html" %}
+
+        </div>
     {% endif %}
 {% endblock %}

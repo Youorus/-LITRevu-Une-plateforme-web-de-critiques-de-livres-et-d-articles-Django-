@@ -1,0 +1,34 @@
+{% load static %}
+<footer class="bg-gray-100 py-6 px-4 mt-10">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <!-- LOGO ET NOM DU SITE -->
+        <a href="{% url 'index' %}" class="text-lg font-semibold text-blue-600 flex items-center space-x-2">
+            📘 <span>LITReview</span>
+        </a>
+
+        <!-- LIENS DE NAVIGATION -->
+        <nav class="flex space-x-5">
+            <a href="#" class="text-gray-600 hover:text-blue-500 transition">Accueil</a>
+            <a href="#" class="text-gray-600 hover:text-blue-500 transition">Flux</a>
+            <a href="#" class="text-gray-600 hover:text-blue-500 transition">Posts</a>
+            <a href="#" class="text-gray-600 hover:text-blue-500 transition">Abonnements</a>
+            <a href="#" class="text-gray-600 hover:text-blue-500 transition">Contact</a>
+        </nav>
+
+        <!-- RÉSEAUX SOCIAUX -->
+        <div class="flex space-x-4">
+            <a href="#" class="w-6 h-6">
+                <img src="{% static 'icons/facebook.svg' %}" alt="Facebook" class="w-full h-full">
+            </a>
+            <a href="#" class="w-6 h-6">
+                <img src="{% static 'icons/x.svg' %}" alt="Twitter" class="w-full h-full">
+            </a>
+            <a href="#" class="w-6 h-6">
+                <img src="{% static 'icons/instagram.svg' %}" alt="Instagram" class="w-full h-full">
+            </a>
+        </div>
+    </div>
+
+    <!-- COPYRIGHT -->
+    <p class="text-center text-gray-500 text-sm mt-6">&copy; 2025 LITReview. Tous droits réservés.</p>
+</footer>
