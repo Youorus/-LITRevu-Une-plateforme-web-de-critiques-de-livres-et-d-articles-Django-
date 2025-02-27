@@ -2,11 +2,7 @@
 {% load static %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        <div class="text-center mt-10 text-lg font-semibold text-gray-700">
-            <p>Page d'accueil</p>
-        </div>
-    {% else %}
+
         <!-- MESSAGE DE BIENVENUE -->
         {% include "welcome_massage.html" %}
 
@@ -19,5 +15,5 @@
              {% include "login_form.html" %}
 
         </div>
-    {% endif %}
+
 {% endblock %}

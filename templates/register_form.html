@@ -1,32 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="bg-white p-10  rounded-lg shadow-lg max-w-3xl mx-auto w-full">
+<div class="bg-white p-10 rounded-lg shadow-lg max-w-3xl mx-auto w-full">
     <h2 class="text-3xl font-bold text-center text-gray-700">Créer un compte</h2>
     <p class="text-center text-gray-500 mt-2">Rejoignez-nous et commencez votre aventure littéraire.</p>
 
     <form method="post" class="mt-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
         {% csrf_token %}
 
+        <!-- Affichage des erreurs globales -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4 col-span-2">
+                {% for error in form.non_field_errors %}
+                    <p class="text-sm">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <!-- Champ Nom d'utilisateur -->
         <div class="col-span-1 md:col-span-2">
             <label class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
-            <input type="text" name="username" placeholder="Nom d'utilisateur" required
-                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {{ form.username }}
+            {% if form.username.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <!-- Champ Mot de passe -->
         <div>
             <label class="block text-gray-700 font-medium mb-2">Mot de passe</label>
-            <input type="password" name="password1" placeholder="Mot de passe" required
-                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <!-- Champ Confirmation du mot de passe -->
         <div>
             <label class="block text-gray-700 font-medium mb-2">Confirmer le mot de passe</label>
-            <input type="password" name="password2" placeholder="Confirmer le mot de passe" required
-                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <!-- Bouton S'inscrire -->
