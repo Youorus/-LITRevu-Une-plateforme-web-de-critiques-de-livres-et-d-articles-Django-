@@ -2,18 +2,16 @@
 {% load static %}
 
 {% block content %}
-
+    {% if not user.is_authenticated %}
         <!-- MESSAGE DE BIENVENUE -->
         {% include "welcome_massage.html" %}
 
         <div class="container mx-auto px-4 mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-
             <!-- SECTION GAUCHE : BANNIÈRE -->
             {% include "signup_banner.html" %}
 
             <!-- SECTION DROITE : FORMULAIRE DE CONNEXION -->
-             {% include "login_form.html" %}
-
+            {% include "login_form.html" %}
         </div>
-
+    {% endif %}
 {% endblock %}
