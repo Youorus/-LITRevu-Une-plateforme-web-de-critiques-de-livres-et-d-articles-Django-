@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Ticket
 import re
 
 
@@ -71,3 +71,45 @@ class UserRegistrationForm(forms.ModelForm):
         return user
 
 
+from django import forms
+from .models import Ticket
+
+class TicketForm(forms.ModelForm):
+    """Formulaire de création d'un ticket avec validation"""
+
+    class Meta:
+        model = Ticket
+        fields = ["title", "description", "image"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Appliquer des classes Tailwind aux champs
+        self.fields["title"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "maxlength": "128"  # Ajout de la restriction HTML
+        })
+        self.fields["description"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "maxlength": "2048"  # Ajout de la restriction HTML
+        })
+        self.fields["image"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        })
+
+    def clean_title(self):
+        """Validation du titre : doit contenir entre 3 et 128 caractères et être unique"""
+        title = self.cleaned_data.get("title", "").strip()
+        if len(title) < 3:
+            raise forms.ValidationError("Le titre doit contenir au moins 3 caractères.")
+        if len(title) > 128:
+            raise forms.ValidationError("Le titre ne peut pas dépasser 128 caractères.")
+        if Ticket.objects.filter(title=title).exists():
+            raise forms.ValidationError("Un ticket avec ce titre existe déjà.")
+        return title
+
+    def clean_description(self):
+        """Validation de la description : facultative mais limitée à 2048 caractères"""
+        description = self.cleaned_data.get("description", "").strip()
+        if description and len(description) > 2048:
+            raise forms.ValidationError("La description ne peut pas dépasser 2048 caractères.")
+        return description

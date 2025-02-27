@@ -61,5 +61,20 @@ def flux(request):
     return render(request, "flux.html")
 
 
+@login_required(login_url="/")
 def new_ticket(request):
-    return render(request, "new_ticket.html")
+    """Vue pour créer un nouveau ticket"""
+    if request.method == "POST":
+        form = TicketForm(request.POST, request.FILES)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user  # Associer le ticket à l'utilisateur connecté
+            ticket.save()
+            messages.success(request, "Votre demande de critique a été publiée !")
+            return redirect("flux")  # Redirige vers la page principale après soumission
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+    else:
+        form = TicketForm()
+
+    return render(request, "new_ticket.html", {"form": form})

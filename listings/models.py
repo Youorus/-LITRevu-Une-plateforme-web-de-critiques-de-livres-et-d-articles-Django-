@@ -45,8 +45,8 @@ class Ticket(models.Model):
     """Modèle pour une demande de critique"""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets")
-    title = models.CharField(max_length=255)  # Suppression de MinLengthValidator
-    description = models.TextField()  # Suppression de MinLengthValidator
+    title = models.CharField( max_length=128)
+    description = models.TextField(max_length=2048,blank=True)
     image = models.ImageField(upload_to="tickets/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
