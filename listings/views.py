@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from listings.forms import UserRegistrationForm
+from listings.forms import UserRegistrationForm, TicketForm
 
 
 def index(request):

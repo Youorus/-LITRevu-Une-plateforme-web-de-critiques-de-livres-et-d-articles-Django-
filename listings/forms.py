@@ -71,9 +71,6 @@ class UserRegistrationForm(forms.ModelForm):
         return user
 
 
-from django import forms
-from .models import Ticket
-
 class TicketForm(forms.ModelForm):
     """Formulaire de création d'un ticket avec validation"""
 
@@ -90,7 +87,8 @@ class TicketForm(forms.ModelForm):
         })
         self.fields["description"].widget.attrs.update({
             "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "maxlength": "2048"  # Ajout de la restriction HTML
+            "maxlength": "2048" ,
+            "rows": "4"# Ajout de la restriction HTML
         })
         self.fields["image"].widget.attrs.update({
             "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

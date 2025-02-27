@@ -6,18 +6,7 @@
 
     <!-- Titre du formulaire -->
     <h2 class="text-2xl font-semibold text-center text-gray-700">Créer une demande de critique</h2>
-    <p class="text-center text-gray-500 mt-2">Remplissez les détails du livre ou de l'article que vous souhaitez faire critiquer.</p>
-
-    <!-- Affichage des erreurs -->
-    {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-            {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <p class="text-sm">{{ error }}</p>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <p class="text-center text-gray-500 mt-2">Livre / Article</p>
 
     <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
         {% csrf_token %}
@@ -26,24 +15,38 @@
         <div>
             <label for="id_title" class="block text-gray-700 font-medium mb-2">Titre</label>
             {{ form.title }}
+            {% if form.title.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.title.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <!-- Champ Description -->
         <div>
             <label for="id_description" class="block text-gray-700 font-medium mb-2">Description</label>
             {{ form.description }}
+            {% if form.description.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <!-- Upload Image avec aperçu -->
-        <div>
-            <label for="id_image" class="block text-gray-700 font-medium mb-2">Image</label>
-            {{ form.image }}
+ <!-- Upload Image avec aperçu -->
+<div class="flex flex-col items-center">
+    <label for="id_image" class="block text-gray-700 font-medium mb-2">Image</label>
+    <input type="file" id="id_image" name="image"
+           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           onchange="previewImage(event)">
 
-            <!-- Affichage de l'aperçu de l'image -->
-            <div class="mt-4">
-                <img id="image-preview" class="w-full max-h-64 object-contain rounded-lg shadow-md hidden">
-            </div>
-        </div>
+    {% if form.image.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.image.errors.0 }}</p>
+    {% endif %}
+
+    <!-- Conteneur d'aperçu centré -->
+    <div id="image-preview-container" class="mt-4 hidden flex justify-center">
+        <img id="image-preview" class="w-full max-w-md max-h-[300px] object-cover rounded-lg shadow-md">
+    </div>
+</div>
+
 
         <!-- Bouton d'envoi -->
         <div class="flex justify-center">
@@ -58,13 +61,24 @@
 <!-- JavaScript pour afficher l'aperçu de l'image -->
 <script>
     function previewImage(event) {
-        let reader = new FileReader();
-        reader.onload = function(){
-            let output = document.getElementById('image-preview');
-            output.src = reader.result;
-            output.classList.remove("hidden");
+        let fileInput = event.target;
+        let previewContainer = document.getElementById('image-preview-container');
+        let previewImage = document.getElementById('image-preview');
+
+        // Vérifier si un fichier est sélectionné
+        if (fileInput.files.length > 0) {
+            let reader = new FileReader();
+
+            reader.onload = function(){
+                previewImage.src = reader.result;
+                previewContainer.classList.remove("hidden"); // Afficher l'aperçu
+            }
+
+            reader.readAsDataURL(fileInput.files[0]); // Lire le fichier sélectionné
+        } else {
+            previewContainer.classList.add("hidden"); // Masquer si aucun fichier
         }
-        reader.readAsDataURL(event.target.files[0]);
     }
 </script>
+
 {% endblock %}
