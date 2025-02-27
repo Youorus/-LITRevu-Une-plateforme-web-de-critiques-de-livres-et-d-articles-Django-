@@ -61,9 +61,7 @@ class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
 
     rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        help_text="Note entre 0 et 5"
-    )
+        validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     headline = models.CharField(max_length=128)
     body = models.TextField(max_length=8192, blank=True)

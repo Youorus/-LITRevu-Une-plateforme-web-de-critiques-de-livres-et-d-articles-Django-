@@ -1,8 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from listings.forms import UserRegistrationForm, TicketForm
+from django.shortcuts import render, redirect, get_object_or_404
+
+from listings.forms import UserRegistrationForm, TicketForm, ReviewForm
+from listings.models import Ticket
 
 
 def index(request):
@@ -78,3 +80,25 @@ def new_ticket(request):
         form = TicketForm()
 
     return render(request, "new_ticket.html", {"form": form})
+
+
+@login_required(login_url="/")
+def new_review(request):
+    """Vue pour créer une critique d'un ticket existant"""
+
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            # review.ticket = ticket
+            review.user = request.user
+            review.save()
+            messages.success(request, "Votre critique a été ajoutée avec succès !")
+            return redirect("flux")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = ReviewForm()
+
+    return render(request, "new_review.html", {"form": form})

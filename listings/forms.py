@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import User, Ticket
+from .models import User, Ticket, Review
 import re
 
 
@@ -111,3 +111,44 @@ class TicketForm(forms.ModelForm):
         if description and len(description) > 2048:
             raise forms.ValidationError("La description ne peut pas dépasser 2048 caractères.")
         return description
+
+class ReviewForm(forms.ModelForm):
+    """Formulaire pour créer une critique avec validation"""
+
+    class Meta:
+        model = Review
+        fields = ["headline", "body", "rating"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Appliquer des classes Tailwind aux champs
+        self.fields["headline"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "placeholder": "Titre de la critique"
+        })
+        self.fields["body"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "placeholder": "Écrivez votre critique (optionnel)",
+            "rows": "4"
+        })
+        self.fields["rating"].widget.attrs.update({
+            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "type": "number",
+            "min": "0",
+            "max": "5",
+            "step": "1"
+        })
+
+    def clean_headline(self):
+        """Validation du titre"""
+        headline = self.cleaned_data.get("headline", "").strip()
+        if len(headline) < 3:
+            raise forms.ValidationError("Le titre doit contenir au moins 3 caractères.")
+        return headline
+
+    def clean_rating(self):
+        """Validation de la note (rating)"""
+        rating = self.cleaned_data.get("rating")
+        if rating is None or not (0 <= rating <= 5):
+            raise forms.ValidationError("La note doit être comprise entre 0 et 5.")
+        return rating
