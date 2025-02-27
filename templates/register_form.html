@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-10  rounded-lg shadow-lg max-w-3xl mx-auto w-full">
+    <h2 class="text-3xl font-bold text-center text-gray-700">Créer un compte</h2>
+    <p class="text-center text-gray-500 mt-2">Rejoignez-nous et commencez votre aventure littéraire.</p>
+
+    <form method="post" class="mt-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% csrf_token %}
+
+        <!-- Champ Nom d'utilisateur -->
+        <div class="col-span-1 md:col-span-2">
+            <label class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required
+                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Champ Mot de passe -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Mot de passe</label>
+            <input type="password" name="password1" placeholder="Mot de passe" required
+                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Champ Confirmation du mot de passe -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Confirmer le mot de passe</label>
+            <input type="password" name="password2" placeholder="Confirmer le mot de passe" required
+                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Bouton S'inscrire -->
+        <div class="col-span-1 md:col-span-2 flex justify-end">
+            <button type="submit"
+                    class="bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+                S'inscrire
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
