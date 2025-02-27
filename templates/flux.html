@@ -3,6 +3,30 @@
 
 {% block content %}
 
-       <p>Page d'acceuil</p>
+    <div class="container mx-auto px-4 mt-10 text-center">
+
+        <!-- Boutons d'action -->
+        <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
+
+            <!-- Bouton Demander une Critique -->
+            <a href="{% url 'new_ticket' %}"
+               class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md
+                      hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+                📖 Demander une critique
+            </a>
+
+            <!-- Bouton Créer une Critique -->
+            <a href=""
+               class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md
+                      hover:bg-green-700 hover:scale-105 transition transform duration-300">
+                ✍️ Créer une critique
+            </a>
+
+        </div>
+
+        <!-- Texte d'introduction -->
+        <p class="text-gray-600 mt-6 text-lg">Parcourez les critiques et partagez vos avis avec la communauté.</p>
+
+    </div>
 
 {% endblock %}

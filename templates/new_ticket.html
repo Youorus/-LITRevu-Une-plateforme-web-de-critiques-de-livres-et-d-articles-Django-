@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+
+    <!-- Titre du formulaire -->
+    <h2 class="text-2xl font-semibold text-center text-gray-700">Créer une demande de critique</h2>
+    <p class="text-center text-gray-500 mt-2">Remplissez les détails du livre ou de l'article que vous souhaitez faire critiquer.</p>
+
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+        {% csrf_token %}
+
+        <!-- Champ Titre -->
+        <div>
+            <label for="title" class="block text-gray-700 font-medium mb-2">Titre</label>
+            <input type="text" id="title" name="title" placeholder="Titre du livre ou article" required
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Champ Description -->
+        <div>
+            <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Décrivez ce que vous attendez de la critique..."
+                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+
+        <!-- Upload Image avec aperçu -->
+        <div>
+            <label for="image" class="block text-gray-700 font-medium mb-2">Image</label>
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)"
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <!-- Affichage de l'aperçu de l'image -->
+            <div class="mt-4">
+                <img id="image-preview" class="w-full max-h-64 object-contain rounded-lg shadow-md hidden">
+            </div>
+        </div>
+
+        <!-- Bouton d'envoi -->
+        <div class="flex justify-center">
+            <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+                Envoyer la demande
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript pour afficher l'aperçu de l'image -->
+<script>
+    function previewImage(event) {
+        let reader = new FileReader();
+        reader.onload = function(){
+            let output = document.getElementById('image-preview');
+            output.src = reader.result;
+            output.classList.remove("hidden");
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}

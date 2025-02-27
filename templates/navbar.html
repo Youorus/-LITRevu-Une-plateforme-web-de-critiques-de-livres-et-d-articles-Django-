@@ -1,18 +1,44 @@
 {% load static %}
-<nav class="bg-white shadow-md py-3 px-6 flex justify-between items-center">
+<nav class="bg-white shadow-md py-3 px-6 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="{% url 'index' %}" class="text-xl font-semibold text-blue-600 flex items-center space-x-2">
+        📘 <span>LITReview</span>
+    </a>
+
+    <!-- Menu Desktop -->
     {% if user.is_authenticated %}
-        <a href="{% url 'index' %}" class="text-lg font-semibold text-blue-600 flex items-center space-x-2">
-            📘 <span>LITReview</span>
-        </a>
-        <div class="flex space-x-6">
-            <a href="#" class="text-gray-700 hover:text-blue-500 transition">Flux</a>
+        <div class="hidden md:flex space-x-6">
+            <a href="{% url 'flux' %}" class="text-gray-700 hover:text-blue-500 transition">Flux</a>
             <a href="#" class="text-gray-700 hover:text-blue-500 transition">Posts</a>
             <a href="#" class="text-gray-700 hover:text-blue-500 transition">Abonnements</a>
-            <a href="{% url 'logout' %}" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">Se Déconnecter</a>
         </div>
-    {% else %}
-        <a href="{% url 'index' %}" class="text-lg font-semibold text-blue-600 mx-auto flex items-center space-x-2">
-            📘 <span>LITReview</span>
+
+        <!-- Bouton Déconnexion -->
+        <a href="{% url 'logout' %}" class="hidden md:inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+            Se Déconnecter
         </a>
+
+        <!-- Menu Mobile (Burger) -->
+        <button id="menu-btn" class="md:hidden text-gray-700 focus:outline-none">
+            ☰
+        </button>
     {% endif %}
+
+    <!-- Menu Mobile (Dropdown) -->
+    <div id="menu" class="absolute top-16 right-6 bg-white shadow-md rounded-lg w-40 hidden md:hidden flex flex-col space-y-2 py-2">
+        <a href="{% url 'flux' %}" class="text-gray-700 hover:bg-gray-100 px-4 py-2">Flux</a>
+        <a href="#" class="text-gray-700 hover:bg-gray-100 px-4 py-2">Posts</a>
+        <a href="#" class="text-gray-700 hover:bg-gray-100 px-4 py-2">Abonnements</a>
+        <a href="{% url 'logout' %}" class="text-red-600 hover:bg-gray-100 px-4 py-2">Se Déconnecter</a>
+    </div>
 </nav>
+
+<!-- Script pour gérer le menu mobile -->
+<script>
+    const menuBtn = document.getElementById("menu-btn");
+    const menu = document.getElementById("menu");
+
+    menuBtn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+</script>

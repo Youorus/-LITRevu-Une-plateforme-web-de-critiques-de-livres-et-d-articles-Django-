@@ -1,35 +1,49 @@
-
 <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm mx-auto w-full h-auto md:h-[22rem] flex flex-col justify-between">
     <h2 class="text-2xl font-semibold text-center text-gray-700">Connexion</h2>
 
-    <!-- Affichage des messages d'erreur -->
-
-
     <form method="post" class="mt-6 w-full flex flex-col justify-between flex-grow">
         {% csrf_token %}
-        
+
+        <!-- Champ Nom d'utilisateur -->
         <div class="mb-4">
             <input type="text" name="username" placeholder="Nom d'utilisateur" required
                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <div class="mb-4">
-            <input type="password" name="password" placeholder="Mot de passe" required
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        <!-- Champ Mot de passe avec bouton œil -->
+        <div class="mb-4 relative">
+            <input type="password" id="password" name="password" placeholder="Mot de passe" required
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10">
+            <!-- Bouton pour afficher/masquer le mot de passe -->
+            <button type="button" id="togglePassword" class="absolute inset-y-0 right-3 flex items-center">
+                👁
+            </button>
         </div>
 
+        <!-- Bouton de connexion -->
         <div class="flex justify-end">
             <button type="submit"
                     class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
                 Se connecter
             </button>
         </div>
-          {% if messages %}
-        <div class="text-red-600 text-sm mt-1">
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+
+        <!-- Affichage des messages d'erreur -->
+        {% if messages %}
+            <div class="text-red-600 text-sm mt-1">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </form>
 </div>
 
+<!-- JavaScript pour basculer la visibilité du mot de passe -->
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        let passwordField = document.getElementById("password");
+        let type = passwordField.type === "password" ? "text" : "password";
+        passwordField.type = type;
+    });
+</script>

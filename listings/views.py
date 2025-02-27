@@ -57,4 +57,9 @@ def logout_view(request):
 @login_required(login_url="/")
 def flux(request):
     """Page principale après connexion"""
+    messages.success(request, f"Bienvenue, {request.user.username} ! 🎉")
     return render(request, "flux.html")
+
+
+def new_ticket(request):
+    return render(request, "new_ticket.html")
