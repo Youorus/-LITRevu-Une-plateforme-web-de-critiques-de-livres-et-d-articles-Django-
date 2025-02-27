@@ -1,6 +1,40 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-    <h1>Bienvenue sur notre site de critiques de livres et articles 📚</h1>
-    <p>Cliquez  pour voir les critiques récentes.</p>
+    {% if user.is_authenticated %}
+
+        <div class="nav-links">
+          <p>page d'acceuil</p>
+        </div>
+    {% else %}
+      <div class="welcome-message">
+        <h1>Bienvenue sur LITReview 📖</h1>
+        <p>Découvrez et partagez des critiques littéraires avec la communauté.</p>
+    </div>
+         <div class="home-container">
+        <!-- Section de gauche : Bannière avec invitation à l'inscription -->
+        <div class="home-left">
+            <div class="banner">
+                <img src="{% static 'listings/banner.png' %}" alt="Rejoignez LITReview">
+                <div class="banner-content">
+                    <h2>Rejoignez la communauté !</h2>
+                    <p>Créez un compte pour partager et lire des critiques de livres.</p>
+                    <a  class="btn btn-primary">Créer un compte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section de droite : Formulaire de connexion -->
+        <div class="home-right">
+            <h2>Connexion</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+                <input type="password" name="password" placeholder="Mot de passe" required>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
