@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator, RegexValidator
+from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
@@ -52,3 +52,22 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"{self.title} (par {self.user.username})"
+
+
+class Review(models.Model):
+    """Modèle pour une critique (review) d'un livre ou d'un article."""
+
+    ticket = models.ForeignKey("Ticket", on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
+
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        help_text="Note entre 0 et 5"
+    )
+
+    headline = models.CharField(max_length=128)
+    body = models.TextField(max_length=8192, blank=True)
+    time_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Critique de {self.user.username} sur {self.ticket.title} - {self.rating}⭐"
