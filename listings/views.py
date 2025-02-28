@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 from listings.forms import UserRegistrationForm, TicketForm, ReviewForm
-from listings.models import Ticket, Review
+from listings.models import Ticket, Review, User, UserFollows
 
 
 def index(request):
@@ -195,4 +195,37 @@ def edit_review(request, review_id):
         "ticket": ticket,  # On envoie le ticket à la template pour l'afficher
         "review": review,
         "edit_mode": True,  # Indicateur pour l'affichage dynamique
+    })
+
+@login_required
+def follow_view(request):
+    """Affiche les abonnés, abonnements et permet de rechercher des utilisateurs"""
+    query = request.GET.get('search', '')
+
+    # Récupère les abonnements et abonnés de l'utilisateur connecté
+    following = UserFollows.objects.filter(user=request.user).select_related("followed_user")
+    followers = UserFollows.objects.filter(followed_user=request.user).select_related("user")
+
+    # Recherche d'un utilisateur
+    search_results = User.objects.exclude(id=request.user.id).filter(username__icontains=query) if query else []
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        user_id = request.POST.get("user_id")
+        target_user = get_object_or_404(User, id=user_id)
+
+        if action == "follow":
+            UserFollows.objects.get_or_create(user=request.user, followed_user=target_user)
+            messages.success(request, f"Vous suivez maintenant {target_user.username}.")
+        elif action == "unfollow":
+            UserFollows.objects.filter(user=request.user, followed_user=target_user).delete()
+            messages.success(request, f"Vous ne suivez plus {target_user.username}.")
+
+        return redirect("follow_view")
+
+    return render(request, "follow.html", {
+        "following": following,
+        "followers": followers,
+        "search_results": search_results,
+        "query": query
     })
