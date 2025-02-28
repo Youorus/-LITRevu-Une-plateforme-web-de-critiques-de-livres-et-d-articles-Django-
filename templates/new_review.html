@@ -1,11 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
 
-{% if not hide_submit %}
     <h2 class="text-2xl font-semibold text-center text-gray-700">Publier une Critique</h2>
-{% else %}
-    <h2 class="text-xl font-semibold text-center text-gray-700">Critique</h2>
-{% endif %}
-
 
     {% if form.errors %}
         <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
@@ -22,79 +21,29 @@
 
         <!-- Champ Titre -->
         <div>
-            <label class="block text-gray-700 font-medium mb-2">Titre</label>
+
             {{ form.headline }}
         </div>
 
-        <!-- Champ Note (Étoiles avec SVG inline) -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Note (0 à 5)</label>
-            <div id="star-container" class="flex space-x-2">
-                {% for i in "12345" %}
-                <button type="button" data-value="{{ i }}" class="star w-10 h-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"
-                         class="star-svg w-full h-full transition duration-200">
-                        <path d="M12 2l3.09 6.26 6.91.99-5 4.87 1.18 6.88L12 17.77l-6.18 3.25 1.18-6.88-5-4.87 6.91-.99z"/>
-                    </svg>
-                </button>
-                {% endfor %}
-            </div>
-            <input type="hidden" name="rating" id="rating-input">
-        </div>
-
+        <!-- Inclusion du système d'étoiles -->
+        {% include "rating.html" %}
         <!-- Champ Critique -->
         <div>
-            <label class="block text-gray-700 font-medium mb-2">Critique</label>
+
             {{ form.body }}
         </div>
 
         <!-- Bouton d'envoi -->
-      {% if not hide_submit %}
-    <div class="flex justify-center">
-        <button type="submit"
-                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-            Publier la critique
-        </button>
-    </div>
-    {% endif %}
+        <div class="flex justify-center">
+            <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+                Publier la critique
+            </button>
+        </div>
     </form>
 </div>
 
-<!-- JavaScript pour gérer les étoiles avec couleur or -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const stars = document.querySelectorAll(".star");
-        const ratingInput = document.getElementById("rating-input");
+<!-- Script JS pour gérer les étoiles -->
+<script src="{% static 'js/rating.js' %}"></script>
 
-        stars.forEach(star => {
-            star.addEventListener("mouseover", function () {
-                let value = this.getAttribute("data-value");
-                highlightStars(value);
-            });
-
-            star.addEventListener("click", function () {
-                let value = this.getAttribute("data-value");
-                ratingInput.value = value;
-                highlightStars(value);
-            });
-
-            star.addEventListener("mouseleave", function () {
-                let selectedValue = ratingInput.value;
-                highlightStars(selectedValue);
-            });
-        });
-
-        function highlightStars(value) {
-            stars.forEach(star => {
-                let starValue = star.getAttribute("data-value");
-                let starSvg = star.querySelector(".star-svg");
-                if (starValue <= value) {
-                    starSvg.setAttribute("fill", "gold");
-                } else {
-                    starSvg.setAttribute("fill", "gray");
-                }
-            });
-        }
-    });
-</script>
-
+{% endblock %}

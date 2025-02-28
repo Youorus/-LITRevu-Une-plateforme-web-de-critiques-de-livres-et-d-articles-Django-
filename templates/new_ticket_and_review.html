@@ -2,26 +2,79 @@
 {% load static %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto mt-10">
+<div class="max-w-3xl rounded-lg shadow-lg bg-white p-8 mx-auto mt-10">
     <h2 class="text-2xl font-semibold text-center text-gray-700">Créer un Ticket et une Critique</h2>
 
     <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6">
         {% csrf_token %}
 
-        <!-- Inclusion du formulaire de ticket -->
+        <!-- 🟢 Inclusion des champs du formulaire de ticket -->
+        <h3 class="text-lg font-semibold text-gray-700">Informations sur le Ticket</h3>
 
-            {% include "new_ticket_form.html" with form=ticket_form hide_submit=hide_submit %}
+        <!-- Champ Titre -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Titre</label>
+            {{ ticket_form.title }}
+            {% if ticket_form.title.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ ticket_form.title.errors.0 }}</p>
+            {% endif %}
+        </div>
 
+        <!-- Champ Description -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Description</label>
+            {{ ticket_form.description }}
+            {% if ticket_form.description.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ ticket_form.description.errors.0 }}</p>
+            {% endif %}
+        </div>
 
-            {% include "new_review.html" with form=review_form hide_submit=hide_submit %}
+        <!-- Upload Image avec aperçu -->
+        <div>
+            {% include "image_upload.html" with field_id="id_image" field_name="image" field_errors=ticket_form.image.errors %}
+        </div>
+
+        <!-- 🟢 Inclusion des champs du formulaire de critique -->
+        <h3 class="text-lg font-semibold text-gray-700">Critique</h3>
+
+        <!-- Champ Titre de la critique -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Titre de la Critique</label>
+            {{ review_form.headline }}
+            {% if review_form.headline.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ review_form.headline.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Champ Critique -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Critique</label>
+            {{ review_form.body }}
+            {% if review_form.body.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ review_form.body.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Inclusion du système d'étoiles -->
+        <div>
+            {% include "rating.html" %}
+            {% if review_form.rating.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ review_form.rating.errors.0 }}</p>
+            {% endif %}
+        </div>
 
         <!-- Bouton de soumission global -->
         <div class="flex justify-center">
             <button type="submit"
                     class="bg-blue-600 mt-4 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-                Publier
+                Publier Ticket et Critique
             </button>
         </div>
     </form>
 </div>
+
+<!-- Script JS pour gérer les étoiles et les images -->
+<script src="{% static 'js/rating.js' %}"></script>
+<script src="{% static 'js/image_upload.js' %}"></script>
+
 {% endblock %}

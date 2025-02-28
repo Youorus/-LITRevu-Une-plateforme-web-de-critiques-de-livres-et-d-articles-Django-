@@ -106,25 +106,26 @@ def new_review(request):
 
 @login_required(login_url="/")
 def create_ticket_and_review(request):
-    """Vue pour créer un ticket et une critique en même temps"""
+    """Vue pour créer un ticket et une critique en même temps sans JavaScript"""
+
     if request.method == "POST":
         ticket_form = TicketForm(request.POST, request.FILES)
         review_form = ReviewForm(request.POST)
 
         if ticket_form.is_valid() and review_form.is_valid():
-            # Création du ticket
+            # Enregistrer le ticket
             ticket = ticket_form.save(commit=False)
             ticket.user = request.user
             ticket.save()
 
-            # Création de la critique liée à ce ticket
+            # Enregistrer la critique associée au ticket
             review = review_form.save(commit=False)
             review.ticket = ticket
             review.user = request.user
             review.save()
 
             messages.success(request, "Votre ticket et votre critique ont été publiés avec succès !")
-            return redirect("flux")  # Redirection vers le flux
+            return redirect("flux")  # Redirige vers la page d'accueil
         else:
             messages.error(request, "Veuillez corriger les erreurs dans les formulaires.")
 
@@ -134,6 +135,5 @@ def create_ticket_and_review(request):
 
     return render(request, "new_ticket_and_review.html", {
         "ticket_form": ticket_form,
-        "review_form": review_form,
-        "hide_submit": True  # Permet de cacher les boutons submit dans les templates inclus
+        "review_form": review_form
     })
