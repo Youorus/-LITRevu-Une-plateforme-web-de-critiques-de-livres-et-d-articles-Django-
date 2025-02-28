@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 from listings.forms import UserRegistrationForm, TicketForm, ReviewForm
-from listings.models import Ticket
+from listings.models import Ticket, Review
 
 
 def index(request):
@@ -141,4 +141,7 @@ def create_ticket_and_review(request):
 def posts(request):
     """Récupère les tickets de l'utilisateur actuel et les envoie à la vue"""
     user_tickets = Ticket.objects.filter(user=request.user).order_by("-created_at")  # Tri par date décroissante
-    return render(request, "posts.html", {"user_tickets": user_tickets})
+    """Récupère et affiche les critiques de l'utilisateur connecté"""
+    reviews = Review.objects.filter(user=request.user).order_by("-time_created")  # Trier par date descendante
+
+    return render(request, "posts.html", {"user_tickets": user_tickets, "reviews": reviews})

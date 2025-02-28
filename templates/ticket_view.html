@@ -20,24 +20,25 @@
     </div>
 
     <!-- Image du livre/article -->
-    {% if ticket.image %}
-        <div class="mt-4">
-            <img src="{{ ticket.image.url }}" alt="Image du livre"
-                 class="w-full h-48 object-cover rounded-lg shadow-md">
-        </div>
-    {% endif %}
+{% if ticket.image %}
+    <div class="mt-4 flex justify-center">
+        <img src="{{ ticket.image.url }}" alt="Image du livre"
+             class="w-full max-h-64 object-contain">
+    </div>
+{% endif %}
+
 
     <!-- Boutons d'action -->
+{% if type == "user_ticket" %}
     <div class="mt-4 flex justify-end space-x-4">
         <a href=""
            class="text-blue-600 font-medium hover:underline">
-            Donner une critique
+            Modifier
         </a>
-        {% if ticket.user == request.user %}
             <a href=""
                class="text-red-600 font-medium hover:underline">
                 Supprimer
             </a>
-        {% endif %}
     </div>
+  {% endif %}
 </div>
