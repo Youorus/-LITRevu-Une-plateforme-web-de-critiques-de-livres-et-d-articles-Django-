@@ -2,6 +2,5 @@
 {% load static %}
 
 {% block content %}
-  {% include "new_ticket_form.html" %}
-
+    {% include "new_ticket_form.html" with form=form edit_mode=False %}
 {% endblock %}

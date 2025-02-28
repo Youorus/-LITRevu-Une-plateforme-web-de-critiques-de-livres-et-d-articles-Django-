@@ -31,7 +31,7 @@
     <!-- Boutons d'action -->
 {% if type == "user_ticket" %}
     <div class="mt-4 flex justify-end space-x-4">
-        <a href=""
+        <a href="{% url 'edit_ticket' ticket.id %}"
            class="text-blue-600 font-medium hover:underline">
             Modifier
         </a>

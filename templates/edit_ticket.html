@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    {% include "new_ticket_form.html" with form=form edit_mode=True ticket=ticket %}
+{% endblock %}
