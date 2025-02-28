@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block content %}
-  {% include "ticket_view.html" %}
+<div class="max-w-3xl mx-auto mt-10 space-y-6">
+    <h2 class="text-2xl font-semibold text-center text-gray-700">Vos publications</h2>
 
+    {% for ticket in user_tickets %}
+        {% include "ticket_view.html" with ticket=ticket %}
+    {% empty %}
+        <p class="text-center text-gray-500">Vous n'avez encore publié aucun ticket.</p>
+    {% endfor %}
+</div>
 {% endblock %}

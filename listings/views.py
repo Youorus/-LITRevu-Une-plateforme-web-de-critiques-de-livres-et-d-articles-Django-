@@ -139,4 +139,6 @@ def create_ticket_and_review(request):
     })
 
 def posts(request):
-    return render(request, "posts.html")
+    """Récupère les tickets de l'utilisateur actuel et les envoie à la vue"""
+    user_tickets = Ticket.objects.filter(user=request.user).order_by("-created_at")  # Tri par date décroissante
+    return render(request, "posts.html", {"user_tickets": user_tickets})

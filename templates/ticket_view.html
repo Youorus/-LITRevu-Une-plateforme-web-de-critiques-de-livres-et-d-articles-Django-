@@ -8,9 +8,9 @@
                 <span class="font-semibold text-gray-700">{{ ticket.user.username }}</span> a demandé une critique
             {% endif %}
         </p>
-<p class="text-gray-400">
-    {{ ticket.created_at|date:"H:i, d F Y" }}
-</p>
+        <p class="text-gray-400">
+            {{ ticket.created_at|date:"H:i, d F Y" }}
+        </p>
     </div>
 
     <!-- Contenu du ticket -->
@@ -34,11 +34,10 @@
             Donner une critique
         </a>
         {% if ticket.user == request.user %}
-            <a href="{% url 'delete_ticket' ticket.id %}"
+            <a href=""
                class="text-red-600 font-medium hover:underline">
                 Supprimer
             </a>
         {% endif %}
     </div>
 </div>
-

@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from listings.views import index, register, flux, logout_view, new_ticket, new_review, create_ticket_and_review, posts
 
@@ -11,3 +13,6 @@ urlpatterns = [
     path("ticket_and_review/new/", create_ticket_and_review, name="new_ticket_and_review"),
     path('posts/', posts, name="posts"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
