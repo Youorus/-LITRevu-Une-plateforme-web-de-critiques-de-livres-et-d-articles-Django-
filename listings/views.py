@@ -80,9 +80,7 @@ def new_ticket(request):
         form = TicketForm()
 
     return render(request, "new_ticket.html", {
-        "form": form,
-        "edit_mode": False,  # Mode création
-        "ticket": None  # Aucun ticket dans ce cas
+        "form": form
     })
 
 
@@ -170,4 +168,29 @@ def edit_ticket(request, ticket_id):
         "form": form,
         "edit_mode": True,  # Mode édition
         "ticket": ticket  # On passe le ticket existant
+    })
+
+@login_required(login_url="/")
+def edit_review(request, review_id):
+    """Vue pour modifier une critique existante sans modifier le ticket"""
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    ticket = review.ticket  # Récupération du ticket lié à la critique
+    print(review.rating)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Votre critique a été mise à jour avec succès !")
+            return redirect("posts")  # Redirige vers les posts de l'utilisateur
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, "edit_review.html", {
+        "form": form,
+        "ticket": ticket,  # On envoie le ticket à la template pour l'afficher
+        "review": review,
+        "edit_mode": True,  # Indicateur pour l'affichage dynamique
     })

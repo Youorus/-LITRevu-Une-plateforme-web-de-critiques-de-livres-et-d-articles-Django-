@@ -5,6 +5,7 @@
 <div class="max-w-3xl rounded-lg shadow-lg bg-white p-8 mx-auto mt-10">
     <h2 class="text-2xl font-semibold text-center text-gray-700">Créer un Ticket et une Critique</h2>
 
+{% include "new_ticket_form.html" with form =  %}
     <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6">
         {% csrf_token %}
 
@@ -57,7 +58,7 @@
 
         <!-- Inclusion du système d'étoiles -->
         <div>
-            {% include "rating.html" %}
+{% include "rating.html" with rating_input_id="rating-input"   %}
             {% if review_form.rating.errors %}
                 <p class="text-red-600 text-sm mt-1">{{ review_form.rating.errors.0 }}</p>
             {% endif %}
@@ -73,8 +74,6 @@
     </form>
 </div>
 
-<!-- Script JS pour gérer les étoiles et les images -->
-<script src="{% static 'js/rating.js' %}"></script>
 <script src="{% static 'js/image_upload.js' %}"></script>
 
 {% endblock %}

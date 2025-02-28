@@ -1,48 +1,58 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const stars = document.querySelectorAll(".star");
-    const ratingInput = document.getElementById("rating-input");
-    const ratingError = document.createElement("p");  // Crée un élément pour l'erreur
-    ratingError.classList.add("text-red-600", "text-sm", "mt-1");
-    ratingError.style.display = "none";  // Cache l'erreur au départ
-    document.getElementById("star-container").appendChild(ratingError);
+    document.querySelectorAll("[id^=star-container]").forEach(starContainer => {
+        const isEditable = starContainer.getAttribute("data-edit") === "true"; // Vérifie le mode édition
+        const stars = starContainer.querySelectorAll(".star");
+        const ratingInput = starContainer.nextElementSibling; // Input caché (s'il existe)
 
-    stars.forEach(star => {
-        star.addEventListener("mouseover", function () {
-            let value = this.getAttribute("data-value");
-            highlightStars(value);
-        });
+        // 🟢 Correction : On récupère bien la valeur de la note actuelle
+        let selectedRating = ratingInput ? ratingInput.value : starContainer.getAttribute("data-rating");
 
-        star.addEventListener("click", function () {
-            let value = this.getAttribute("data-value");
-            ratingInput.value = value;  // ✅ Stocke la note
-            highlightStars(value);
-            ratingError.style.display = "none";  // ✅ Cache l'erreur après sélection
-        });
+        // Convertir en entier pour éviter les bugs d'affichage
+        selectedRating = parseInt(selectedRating, 10) || 0;
 
-        star.addEventListener("mouseleave", function () {
-            let selectedValue = ratingInput.value;
-            highlightStars(selectedValue);
-        });
-    });
+        function highlightStars(value) {
+            stars.forEach(star => {
+                let starValue = parseInt(star.getAttribute("data-value"), 10);
+                let starSvg = star.querySelector(".star-svg");
+                starSvg.setAttribute("fill", starValue <= value ? "gold" : "gray");
+            });
+        }
 
-    function highlightStars(value) {
-        stars.forEach(star => {
-            let starValue = star.getAttribute("data-value");
-            let starSvg = star.querySelector(".star-svg");
-            if (starValue <= value) {
-                starSvg.setAttribute("fill", "gold");
-            } else {
-                starSvg.setAttribute("fill", "gray");
-            }
-        });
-    }
+        // ✅ Appliquer immédiatement la note actuelle au chargement
+        highlightStars(selectedRating);
 
-    // Vérifie la note avant de soumettre le formulaire
-    document.querySelector("form").addEventListener("submit", function (event) {
-        if (ratingInput.value === "0") {
-            event.preventDefault();  // ✅ Bloque l'envoi du formulaire
-            ratingError.innerText = "Veuillez sélectionner une note.";
-            ratingError.style.display = "block";  // ✅ Affiche l'erreur
+        if (isEditable) {
+            stars.forEach(star => {
+                star.addEventListener("mouseover", function () {
+                    highlightStars(this.getAttribute("data-value"));
+                });
+
+                star.addEventListener("mouseleave", function () {
+                    highlightStars(selectedRating);
+                });
+
+                star.addEventListener("click", function () {
+                    selectedRating = parseInt(this.getAttribute("data-value"), 10);
+                    ratingInput.value = selectedRating; // ✅ Stocke la note
+                    highlightStars(selectedRating);
+                });
+
+                // Accessibilité : Touche Enter pour valider
+                star.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        selectedRating = parseInt(this.getAttribute("data-value"), 10);
+                        ratingInput.value = selectedRating;
+                        highlightStars(selectedRating);
+                    }
+                });
+            });
+        } else {
+            // Mode lecture : On applique seulement la note et on bloque les interactions
+            stars.forEach(star => {
+                star.setAttribute("disabled", "true");
+                star.classList.add("pointer-events-none");
+            });
         }
     });
 });
