@@ -78,27 +78,13 @@ class TicketForm(forms.ModelForm):
         model = Ticket
         fields = ["title", "description", "image"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Appliquer des classes Tailwind aux champs
-        self.fields["title"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "maxlength": "128",
-            "placeholder": "Titre"
-        })
-        self.fields["description"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "maxlength": "2048" ,
-            "rows": "4",
-            "placeholder": "Description (optionnel)"
-        })
-        self.fields["image"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        })
-
     def clean_title(self):
         """Validation du titre : doit contenir entre 3 et 128 caractères et être unique"""
         title = self.cleaned_data.get("title", "").strip()
+
+        if not title:  # ✅ Vérifie si le champ est vide après suppression des espaces
+            raise forms.ValidationError("Le titre ne peut pas être vide.")
+
         if len(title) < 3:
             raise forms.ValidationError("Le titre doit contenir au moins 3 caractères.")
         if len(title) > 128:
@@ -121,29 +107,13 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ["headline", "body", "rating"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Appliquer des classes Tailwind aux champs
-        self.fields["headline"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "placeholder": "Titre"
-        })
-        self.fields["body"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "placeholder": "Votre critique (optionnel)",
-            "rows": "4"
-        })
-        self.fields["rating"].widget.attrs.update({
-            "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "type": "number",
-            "min": "0",
-            "max": "5",
-            "step": "1",
-        })
-
     def clean_headline(self):
         """Validation du titre"""
         headline = self.cleaned_data.get("headline", "").strip()
+
+        if not headline:  # ✅ Vérifie si le champ est vide après suppression des espaces
+            raise forms.ValidationError("Le titre ne peut pas être vide.")
+
         if len(headline) < 3:
             raise forms.ValidationError("Le titre doit contenir au moins 3 caractères.")
         return headline
@@ -152,9 +122,8 @@ class ReviewForm(forms.ModelForm):
         """Validation de la note (rating)"""
         rating = self.cleaned_data.get("rating")
 
-        if rating is None or rating == "":
-            raise forms.ValidationError("Veuillez donner une note.")
-
+        if rating is None:  # Si rating est vide, on attribue 1 par défaut
+            return 1
         if not (0 <= rating <= 5):
             raise forms.ValidationError("La note doit être comprise entre 0 et 5.")
 

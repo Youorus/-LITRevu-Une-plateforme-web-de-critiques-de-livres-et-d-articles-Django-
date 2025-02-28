@@ -2,5 +2,14 @@
 {% load static %}
 
 {% block content %}
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+    <!-- Titre du formulaire dynamique -->
+    <h2 class="text-2xl font-semibold text-center text-gray-700">
+Créer une demande de critique
+    </h2>
+    <p class="text-center text-gray-500 mt-2">Livre / Article</p>
+
     {% include "new_ticket_form.html" with form=form edit_mode=False %}
+</div>
+
 {% endblock %}

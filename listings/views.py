@@ -74,8 +74,6 @@ def new_ticket(request):
             ticket.save()
             messages.success(request, "Votre demande de critique a été publiée !")
             return redirect("flux")
-        else:
-            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
     else:
         form = TicketForm()
 
@@ -113,6 +111,9 @@ def create_ticket_and_review(request):
     if request.method == "POST":
         ticket_form = TicketForm(request.POST, request.FILES)
         review_form = ReviewForm(request.POST)
+        print(f"📩 Données passées au ReviewForm : {review_form.data}")
+
+        print(f"📩 Données reçues dans request.POST : {request.POST}")
 
         if ticket_form.is_valid() and review_form.is_valid():
             # Enregistrer le ticket
@@ -129,15 +130,16 @@ def create_ticket_and_review(request):
             messages.success(request, "Votre ticket et votre critique ont été publiés avec succès !")
             return redirect("flux")  # Redirige vers la page d'accueil
         else:
-            messages.error(request, "Veuillez corriger les erreurs dans les formulaires.")
+            print(review_form.errors)
 
     else:
         ticket_form = TicketForm()
         review_form = ReviewForm()
-
     return render(request, "new_ticket_and_review.html", {
         "ticket_form": ticket_form,
-        "review_form": review_form
+        "review_form": review_form,
+        "edit_mode": True,
+
     })
 
 def posts(request):

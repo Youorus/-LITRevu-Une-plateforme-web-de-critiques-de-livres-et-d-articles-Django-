@@ -1,57 +1,45 @@
 {% load static %}
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+<form id="review-form" method="post" class="mt-6 space-y-4">
+    {% csrf_token %}
 
-    <!-- 🟢 Détection du mode édition -->
-    {% if edit_mode %}
-        <h2 class="text-2xl font-semibold text-center text-gray-700">Modifier votre Critique</h2>
-    {% else %}
-        <h2 class="text-2xl font-semibold text-center text-gray-700">Publier une Critique </h2>
-    {% endif %}
+    <!-- Champ Titre de la Critique -->
+    <div>
+        <input type="text" required placeholder="Titre" name="headline" id="id_headline"
+       value="{{ form.headline.value|default_if_none:'' }}"
+       class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-    {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-            {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <p class="text-sm">{{ error }}</p>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <form method="post" class="mt-6 space-y-4">
-        {% csrf_token %}
-
-        <!-- Champ Titre -->
-        <div>
-            {{ form.headline }}
-        </div>
-
-        <!-- Inclusion du système d'étoiles (Prend en compte la note existante) -->
-{% if edit_mode %}
-
-{% include "rating.html" with rating_input_id="rating-input" rating=review.rating edit_mode=True %}
-{% else %}
-{% include "rating.html" with rating_input_id="rating-input"   %}
+{% if form.headline.errors %}
+    <p class="text-red-500 text-sm mt-1">{{ form.headline.errors.0 }}</p>
 {% endif %}
+    </div>
 
+    <!-- Inclusion du système d'étoiles -->
+    {% if edit_mode %}
+        {% include "rating.html" with rating_input_id="rating-input" rating=review.rating edit_mode=True %}
+    {% else %}
+        {% include "rating.html" with rating_input_id="rating-input" %}
+    {% endif %}
 
-        <!-- Champ Critique -->
-        <div>
-            {{ form.body }}
-        </div>
+    <!-- Champ Critique -->
+    <div>
+     <textarea name="{{ form.body.name }}" rows="4" placeholder="Votre Opinion"  id="id_body"
+              class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.body.value|default_if_none:'' }}</textarea>
+     {% if form.body.errors %}
+    <p class="text-red-500 text-sm mt-1">{{ form.body.errors.0 }}</p>
+{% endif %}
+    </div>
 
-        <!-- 🟢 Bouton dynamique -->
-        <div class="flex justify-center">
-            <button type="submit"
-                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-                {% if edit_mode %}
-                    Mettre à jour la critique
-                {% else %}
-                    Publier la critique
-                {% endif %}
-            </button>
-        </div>
-    </form>
-</div>
-
-
+    <!-- 🟢 Bouton dynamique -->
+    {% if not hide_submit %}
+    <div class="flex justify-center">
+        <button type="submit"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+            {% if edit_mode %}
+                Mettre à jour la critique
+            {% else %}
+                Publier la critique
+            {% endif %}
+        </button>
+    </div>
+    {% endif %}
+</form>

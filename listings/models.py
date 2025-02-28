@@ -45,7 +45,9 @@ class Ticket(models.Model):
     """Modèle pour une demande de critique"""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets")
-    title = models.CharField( max_length=128)
+    title = models.CharField( max_length=128,error_messages={
+            "blank": "Le titre est obligatoire."
+        })
     description = models.TextField(max_length=2048,blank=True)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,10 +62,12 @@ class Review(models.Model):
     ticket = models.ForeignKey("Ticket", on_delete=models.CASCADE, related_name="reviews")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
 
-    rating = models.PositiveSmallIntegerField(
+    rating = models.PositiveSmallIntegerField( blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(5)])
 
-    headline = models.CharField(max_length=128)
+    headline = models.CharField(max_length=128, error_messages={
+            "blank": "Le titre est obligatoire."
+        })
     body = models.TextField(max_length=8192, blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
 

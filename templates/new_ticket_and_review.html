@@ -2,78 +2,91 @@
 {% load static %}
 
 {% block content %}
-<div class="max-w-3xl rounded-lg shadow-lg bg-white p-8 mx-auto mt-10">
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
     <h2 class="text-2xl font-semibold text-center text-gray-700">Créer un Ticket et une Critique</h2>
 
-{% include "new_ticket_form.html" with form =  %}
-    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6">
+    <!-- ✅ UN SEUL FORMULAIRE POUR TOUT -->
+
         {% csrf_token %}
 
-        <!-- 🟢 Inclusion des champs du formulaire de ticket -->
-        <h3 class="text-lg font-semibold text-gray-700">Informations sur le Ticket</h3>
+        <!-- 🟢 Section Ticket -->
+        <h3 class="text-lg font-semibold text-gray-700">Ticket</h3>
+        {% include "new_ticket_form.html" with form=ticket_form hide_submit=True %}
 
-        <!-- Champ Titre -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Titre</label>
-            {{ ticket_form.title }}
-            {% if ticket_form.title.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ ticket_form.title.errors.0 }}</p>
-            {% endif %}
-        </div>
+        <!-- 🟢 Section Critique -->
+        <h3 class="text-lg font-semibold text-gray-700 mt-6">Critique</h3>
+        {% include "new_review_form.html" with form=review_form hide_submit=True edit_mode=True %}
 
-        <!-- Champ Description -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Description</label>
-            {{ ticket_form.description }}
-            {% if ticket_form.description.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ ticket_form.description.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Upload Image avec aperçu -->
-        <div>
-            {% include "image_upload.html" with field_id="id_image" field_name="image" field_errors=ticket_form.image.errors %}
-        </div>
-
-        <!-- 🟢 Inclusion des champs du formulaire de critique -->
-        <h3 class="text-lg font-semibold text-gray-700">Critique</h3>
-
-        <!-- Champ Titre de la critique -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Titre de la Critique</label>
-            {{ review_form.headline }}
-            {% if review_form.headline.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ review_form.headline.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Champ Critique -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Critique</label>
-            {{ review_form.body }}
-            {% if review_form.body.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ review_form.body.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Inclusion du système d'étoiles -->
-        <div>
-{% include "rating.html" with rating_input_id="rating-input"   %}
-            {% if review_form.rating.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ review_form.rating.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Bouton de soumission global -->
-        <div class="flex justify-center">
-            <button type="submit"
-                    class="bg-blue-600 mt-4 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-                Publier Ticket et Critique
-            </button>
-        </div>
-    </form>
+        <!-- ✅ Bouton de soumission global -->
+       <div class="flex justify-center">
+    <button id="global-submit-btn" type="button"
+            class="bg-blue-600 mt-4 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
+        Publier Ticket et Critique
+    </button>
 </div>
 
-<script src="{% static 'js/image_upload.js' %}"></script>
+</div>
+
+<!-- ✅ JavaScript pour déboguer et voir ce qui est envoyé -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const globalSubmitBtn = document.getElementById("global-submit-btn");
+    const ticketForm = document.getElementById("ticket-form");
+    const reviewForm = document.getElementById("review-form");
+
+    if (globalSubmitBtn && ticketForm && reviewForm) {
+        globalSubmitBtn.addEventListener("click", function (event) {
+            event.preventDefault(); // ✅ Empêche la soumission immédiate
+
+            console.log("📤 Fusion et soumission des formulaires...");
+
+            // 🔹 On crée un formulaire temporaire pour fusionner les données
+            let mergedForm = document.createElement("form");
+            mergedForm.method = "post";
+            mergedForm.action = window.location.href; // Django gère l'envoi
+            mergedForm.enctype = "multipart/form-data";
+
+            // 🔹 Ajoute le CSRF token pour la sécurité
+            let csrfTokenInput = document.createElement("input");
+            csrfTokenInput.type = "hidden";
+            csrfTokenInput.name = "csrfmiddlewaretoken";
+            csrfTokenInput.value = document.querySelector("[name=csrfmiddlewaretoken]").value;
+            mergedForm.appendChild(csrfTokenInput);
+
+            // 🔹 Fonction pour ajouter les champs au formulaire fusionné
+            function appendFormData(sourceForm) {
+                new FormData(sourceForm).forEach((value, key) => {
+                    if (key === "rating" && (!value || value === "0")) {
+                        value = "1"; // ✅ Si aucune note n'est sélectionnée, on met 1
+                        console.warn("⚠️ Aucun rating sélectionné, valeur par défaut : 1");
+                    }
+
+                    if (key === "image") {
+                        let fileInput = sourceForm.querySelector("[name=image]");
+                        if (fileInput && fileInput.files.length > 0) {
+                            mergedForm.appendChild(fileInput.cloneNode(true));
+                        }
+                    } else {
+                        let input = document.createElement("input");
+                        input.type = "hidden";
+                        input.name = key;
+                        input.value = value;
+                        mergedForm.appendChild(input);
+                    }
+                });
+            }
+
+            // 🔹 Fusionne les données des deux formulaires
+            appendFormData(ticketForm);
+            appendFormData(reviewForm);
+
+            // ✅ Ajoute le formulaire temporaire au document et soumet
+            document.body.appendChild(mergedForm);
+            mergedForm.submit();
+        });
+    }
+});
+
+</script>
 
 {% endblock %}

@@ -1,49 +1,40 @@
 {% load static %}
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
-    <!-- Titre du formulaire dynamique -->
-    <h2 class="text-2xl font-semibold text-center text-gray-700">
-        {% if edit_mode %} Modifier votre ticket {% else %} Créer une demande de critique {% endif %}
-    </h2>
-    <p class="text-center text-gray-500 mt-2">Livre / Article</p>
+<form id="ticket-form" method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+    {% csrf_token %}
 
-    <!-- Affichage des erreurs -->
-    {% if form.errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-            {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <p class="text-sm">{{ error }}</p>
-                {% endfor %}
-            {% endfor %}
-        </div>
+    <!-- Champ Titre -->
+    <div>
+        <input type="text" placeholder="Titre" required name="{{ form.title.name }}" value="{{ form.title.value|default_if_none:'' }}"
+           class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+   {% if form.title.errors %}
+    <p class="text-red-500 text-sm mt-1">{{ form.title.errors.0 }}</p>
+{% endif %}
+
+    </div>
+
+    <!-- Champ Description -->
+    <div>
+        <textarea name="{{ form.description.name }}" rows="4"
+                  placeholder="description (optionnel)"
+                  class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.description.value|default_if_none:'' }}</textarea>
+       {% if form.description.errors %}
+    <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
+{% endif %}
+
+    </div>
+
+    <!-- Upload Image avec aperçu -->
+    {% include "image_upload.html" with field_id="id_image" field_name="image" image_url=ticket.image.url %}
+
+    <!-- Bouton d'envoi dynamique -->
+    {% if not hide_submit %}
+    <div class="flex justify-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            Publier Ticket
+        </button>
+    </div>
     {% endif %}
-
-    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
-        {% csrf_token %}
-
-        <!-- Champ Titre -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Titre</label>
-            {{ form.title }}
-        </div>
-
-        <!-- Champ Description -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-2">Description</label>
-            {{ form.description }}
-        </div>
-
-        <!-- Upload Image avec aperçu -->
-{% include "image_upload.html" with field_id="id_image" field_name="image" image_url=ticket.image.url %}
-
-        <!-- Bouton d'envoi dynamique -->
-        <div class="flex justify-center">
-            <button type="submit"
-                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-                {% if edit_mode %} Mettre à jour {% else %} Publier {% endif %}
-            </button>
-        </div>
-    </form>
-</div>
+</form>
 
 <!-- JavaScript pour afficher l'aperçu de l'image -->
 <script src="{% static 'js/image_upload.js' %}"></script>

@@ -4,6 +4,15 @@
 {% block content %}
 
 
-  {% include "new_review_form.html"  %}
+
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+
+    <!-- 🟢 Détection du mode édition -->
+
+        <h2 class="text-2xl font-semibold text-center text-gray-700">Publier une Critique </h2>
+
+      {% include "new_review_form.html"  %}
+
+</div>
 
 {% endblock %}

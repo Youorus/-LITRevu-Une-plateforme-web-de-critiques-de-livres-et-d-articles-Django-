@@ -20,7 +20,7 @@
 
     <!-- Champ caché pour stocker la note sélectionnée -->
     {% if edit_mode %}
-    <input type="hidden" name="rating" id="{{ rating_input_id }}" value="{{ rating|default:0 }}">
+<input type="hidden" name="rating" id="{{ rating_input_id }}" value="{{ rating|default:0 }}">
     {% endif %}
 </div>
 <script src="{% static 'js/rating.js' %}"></script>

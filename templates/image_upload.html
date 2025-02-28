@@ -1,21 +1,33 @@
 <div class="flex flex-col items-center">
-    <label for="{{ field_id }}" class="block text-gray-700 font-medium mb-2">Image</label>
+    <!-- Label pour gérer le champ d'upload en cliquant sur la zone -->
+    <label for="{{ field_id }}" class="cursor-pointer w-full max-w-md">
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center text-gray-500 hover:border-blue-500 transition">
+            <!-- Placeholder (affiché si aucune image) -->
+            <div id="placeholder-{{ field_id }}" class="{% if image_url %}hidden{% endif %} flex flex-col items-center">
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <p class="mt-2 text-sm text-gray-600">Cliquez pour ajouter une image</p>
+            </div>
 
-    <!-- Champ d'upload d'image -->
+            <!-- Aperçu de l'image (caché si aucune image) -->
+            <div id="preview-container-{{ field_id }}" class="mt-4 {% if image_url %}flex{% else %}hidden{% endif %} justify-center">
+                <img id="preview-{{ field_id }}"
+                     src="{{ image_url|default:'' }}"
+                     class="w-full max-w-md max-h-[300px] object-cover rounded-lg shadow-md"
+                     {% if image_url %}data-existing-image="{{ image_url }}"{% endif %}>
+            </div>
+        </div>
+    </label>
+
+    <!-- Champ d'upload d'image caché -->
     <input type="file" id="{{ field_id }}" name="{{ field_name }}"
-           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           class="hidden"
+           accept="image/*"
            onchange="previewImage(event, '{{ field_id }}')">
 
     <!-- Affichage des erreurs -->
     {% if field_errors %}
         <p class="text-red-600 text-sm mt-1">{{ field_errors.0 }}</p>
     {% endif %}
-
-    <!-- Conteneur d'aperçu centré -->
-    <div id="preview-container-{{ field_id }}" class="mt-4 {% if image_url %}flex{% else %}hidden{% endif %} justify-center">
-        <img id="preview-{{ field_id }}"
-             src="{{ image_url|default:'' }}"
-             class="w-full max-w-md max-h-[300px] object-cover rounded-lg shadow-md"
-             {% if image_url %}data-existing-image="{{ image_url }}"{% endif %}>
-    </div>
 </div>
