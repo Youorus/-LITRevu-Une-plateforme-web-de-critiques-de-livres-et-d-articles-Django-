@@ -26,14 +26,20 @@
     <!-- Upload Image avec aperçu -->
     {% include "image_upload.html" with field_id="id_image" field_name="image" image_url=ticket.image.url %}
 
+
     <!-- Bouton d'envoi dynamique -->
-    {% if not hide_submit %}
-    <div class="flex justify-center">
-        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+{% if not hide_submit %}
+<div class="flex justify-center">
+    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+        {% if edit_mode %}
+            Mettre à jour le Ticket
+        {% else %}
             Publier Ticket
-        </button>
-    </div>
-    {% endif %}
+        {% endif %}
+    </button>
+</div>
+{% endif %}
+
 </form>
 
 <!-- JavaScript pour afficher l'aperçu de l'image -->

@@ -1,9 +1,10 @@
 {% load static %}
 <nav class="bg-white shadow-md py-3 px-6 flex items-center justify-between">
     <!-- Logo -->
-    <a href="{% url 'index' %}" class="text-xl font-semibold text-blue-600 flex items-center space-x-2">
-        📘 <span>LITReview</span>
-    </a>
+<a href="{% url 'index' %}" class="text-xl font-semibold text-gray-600 flex items-center space-x-2">
+    <img src="{% static 'logo.png' %}" alt="Logo LITReview" class="h-8 w-30">
+    <span>LITReview</span>
+</a>
 
     <!-- Menu Desktop -->
     {% if user.is_authenticated %}
