@@ -137,3 +137,6 @@ def create_ticket_and_review(request):
         "ticket_form": ticket_form,
         "review_form": review_form
     })
+
+def posts(request):
+    return render(request, "posts.html")
