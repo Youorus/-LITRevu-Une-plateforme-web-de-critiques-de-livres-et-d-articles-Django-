@@ -3,6 +3,7 @@
 LITReview est une application web permettant aux utilisateurs de **publier des demandes de critiques**, **écrire des critiques** et **s'abonner à d'autres utilisateurs** pour suivre leurs publications.
 
 ---
+![](logo.PNG)
 
 ## 🚀 **Fonctionnalités Principales**
 - 📌 **Création de Tickets** : Demande de critiques sur un sujet ou un livre.
