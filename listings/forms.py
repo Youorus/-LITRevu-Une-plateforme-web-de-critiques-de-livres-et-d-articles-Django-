@@ -9,11 +9,19 @@ class UserRegistrationForm(forms.ModelForm):
 
     password1 = forms.CharField(
         label="Mot de passe",
-        widget=forms.PasswordInput(attrs={"class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            }
+        ),
     )
     password2 = forms.CharField(
         label="Confirmer le mot de passe",
-        widget=forms.PasswordInput(attrs={"class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            }
+        ),
     )
 
     class Meta:
@@ -21,9 +29,11 @@ class UserRegistrationForm(forms.ModelForm):
         fields = ["username"]
 
         widgets = {
-            "username": forms.TextInput(attrs={
-                "class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            }),
+            "username": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                }
+            ),
         }
 
     def clean_username(self):
@@ -32,13 +42,19 @@ class UserRegistrationForm(forms.ModelForm):
 
         # Vérifier si le nom d'utilisateur existe déjà
         if User.objects.filter(username=username).exists():
-            raise ValidationError("Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.")
+            raise ValidationError(
+                "Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre."
+            )
 
         # Vérifier la longueur du nom d'utilisateur
         if len(username) < 3:
-            raise ValidationError("Le nom d'utilisateur doit contenir au moins 3 caractères.")
+            raise ValidationError(
+                "Le nom d'utilisateur doit contenir au moins 3 caractères."
+            )
         if len(username) > 10:
-            raise ValidationError("Le nom d'utilisateur ne peut pas dépasser 30 caractères.")
+            raise ValidationError(
+                "Le nom d'utilisateur ne peut pas dépasser 30 caractères."
+            )
 
         return username
 
@@ -46,10 +62,14 @@ class UserRegistrationForm(forms.ModelForm):
         """Valide le mot de passe : 8 caractères, 1 majuscule, 1 chiffre"""
         password1 = self.cleaned_data.get("password1")
         if len(password1) < 8:
-            raise ValidationError("Le mot de passe doit contenir au moins 8 caractères.")
-        if not re.search(r'[A-Z]', password1):
-            raise ValidationError("Le mot de passe doit contenir au moins une lettre majuscule.")
-        if not re.search(r'[0-9]', password1):
+            raise ValidationError(
+                "Le mot de passe doit contenir au moins 8 caractères."
+            )
+        if not re.search(r"[A-Z]", password1):
+            raise ValidationError(
+                "Le mot de passe doit contenir au moins une lettre majuscule."
+            )
+        if not re.search(r"[0-9]", password1):
             raise ValidationError("Le mot de passe doit contenir au moins un chiffre.")
         return password1
 
@@ -95,8 +115,11 @@ class TicketForm(forms.ModelForm):
         """Validation de la description : facultative mais limitée à 2048 caractères"""
         description = self.cleaned_data.get("description", "").strip()
         if description and len(description) > 2048:
-            raise forms.ValidationError("La description ne peut pas dépasser 2048 caractères.")
+            raise forms.ValidationError(
+                "La description ne peut pas dépasser 2048 caractères."
+            )
         return description
+
 
 class ReviewForm(forms.ModelForm):
     """Formulaire pour créer une critique avec validation"""
@@ -109,7 +132,9 @@ class ReviewForm(forms.ModelForm):
         """Validation du titre"""
         headline = self.cleaned_data.get("headline", "").strip()
 
-        if not headline:  # ✅ Vérifie si le champ est vide après suppression des espaces
+        if (
+            not headline
+        ):  # ✅ Vérifie si le champ est vide après suppression des espaces
             raise forms.ValidationError("Le titre ne peut pas être vide.")
 
         if len(headline) < 3:

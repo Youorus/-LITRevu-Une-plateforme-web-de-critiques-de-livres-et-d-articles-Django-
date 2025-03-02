@@ -1,30 +1,56 @@
-<!-- Champ Mot de passe -->
-<div class="relative">
-    <input type="password" id="password1" name="password1" placeholder="Mot de passe" required
-           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10">
-    <button type="button" id="togglePassword1" class="absolute inset-y-0 right-3 flex items-center">
-        👁
-    </button>
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white p-10 rounded-lg shadow-lg max-w-3xl mx-auto w-full">
+    <h2 class="text-3xl font-bold text-center text-gray-700">Créer un compte</h2>
+    <p class="text-center text-gray-500 mt-2">Rejoignez-nous et commencez votre aventure littéraire.</p>
+
+    <form method="post" class="mt-6 space-y-4">
+        {% csrf_token %}
+
+        <!-- Affichage des erreurs globales -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+                {% for error in form.non_field_errors %}
+                    <p class="text-sm">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Champ Nom d'utilisateur -->
+        <div>
+            <input type="text" name="{{ form.username.name }}" placeholder="Nom d'utilisateur" required
+                   value="{{ form.username.value|default_if_none:'' }}"
+                   class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {% if form.username.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Champ Mot de passe -->
+        <div>
+            <input type="password" name="{{ form.password1.name }}" placeholder="Mot de passe" required
+                   class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {% if form.password1.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Champ Confirmation du mot de passe -->
+        <div>
+            <input type="password" name="{{ form.password2.name }}" placeholder="Confirmer le mot de passe" required
+                   class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {% if form.password2.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Bouton S'inscrire -->
+        <div class="flex justify-center">
+            <button type="submit"
+                    class="bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition">
+                S'inscrire
+            </button>
+        </div>
+    </form>
 </div>
-
-<!-- Champ Confirmation du mot de passe -->
-<div class="relative">
-    <input type="password" id="password2" name="password2" placeholder="Confirmer le mot de passe" required
-           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10">
-    <button type="button" id="togglePassword2" class="absolute inset-y-0 right-3 flex items-center">
-        👁
-    </button>
-</div>
-
-<!-- Script pour activer l’affichage des mots de passe -->
-<script>
-    document.getElementById("togglePassword1").addEventListener("click", function () {
-        let passwordField = document.getElementById("password1");
-        passwordField.type = passwordField.type === "password" ? "text" : "password";
-    });
-
-    document.getElementById("togglePassword2").addEventListener("click", function () {
-        let passwordField = document.getElementById("password2");
-        passwordField.type = passwordField.type === "password" ? "text" : "password";
-    });
-</script>
+{% endblock %}

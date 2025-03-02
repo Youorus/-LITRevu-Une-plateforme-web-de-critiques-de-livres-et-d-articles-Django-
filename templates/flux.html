@@ -4,55 +4,66 @@
 {% block content %}
 <div class="container mx-auto px-4 mt-10 text-center">
 
-    <!-- Boutons d'action -->
+    <!-- ✅ Boutons d'action avec aria-label -->
     <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
-        <a href="{% url 'new_ticket' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-blue-700 hover:scale-105 transition duration-300">
+        <a href="{% url 'new_ticket' %}"
+           class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-blue-700 hover:scale-105 transition duration-300"
+           aria-label="Créer un ticket pour demander une critique">
             📖 Demander une critique
         </a>
-        <a href="{% url 'new_ticket_and_review' %}" class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700 hover:scale-105 transition duration-300">
+        <a href="{% url 'new_ticket_and_review' %}"
+           class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700 hover:scale-105 transition duration-300"
+           aria-label="Créer un ticket avec une critique">
             ✍️ Créer une critique
         </a>
     </div>
 
-    <!-- Texte d'introduction -->
-    <p class="text-gray-600 mt-6 text-lg">Parcourez les critiques et partagez vos avis avec la communauté.</p>
+    <!-- ✅ Texte d'introduction avec meilleur contraste -->
+    <p class="text-gray-700 mt-6 text-lg">Parcourez les critiques et partagez vos avis avec la communauté.</p>
 
-    <!-- Affichage des posts -->
+    <!-- ✅ Affichage des posts -->
     {% for post in posts %}
         {% if post.content_type == 'TICKET' %}
             <div id="ticket-{{ post.id }}" class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-6">
-                <div class="flex justify-between items-center text-gray-500 text-sm">
+                <div class="flex justify-between items-center text-gray-700 text-sm">
                     <p>
                         {% if post.user == request.user %}
                             Vous avez publié un ticket
                         {% else %}
-                            <span class="font-semibold text-gray-700">{{ post.user.username }}</span> a demandé une critique
+                            <span class="font-semibold text-gray-900">{{ post.user.username }}</span> a demandé une critique
                         {% endif %}
                     </p>
-                    <p class="text-gray-400">{{ post.created_at|date:"H:i, d F Y" }}</p>
+                    <p class="text-gray-700">{{ post.created_at|date:"H:i, d F Y" }}</p>
                 </div>
 
-                <h3 class="text-lg font-semibold text-gray-900 mt-4">{{ post.title }}</h3>
-                <p class="text-gray-600 mt-2">{{ post.description }}</p>
+                <!-- ✅ Titre avec bonne hiérarchie et lisibilité -->
+                <h2 class="text-lg font-semibold text-gray-900 mt-4">{{ post.title }}</h2>
+                <p class="text-gray-700 mt-2">{{ post.description }}</p>
 
+                <!-- ✅ Image avec alt descriptif -->
                 {% if post.image %}
                     <div class="mt-4 flex justify-center">
-                        <img src="{{ post.image.url }}" alt="Image du livre" class="w-full max-h-64 object-contain">
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}"
+                             class="w-full max-h-64 object-contain rounded-md">
                     </div>
                 {% endif %}
 
-                <!-- Vérification avant d'afficher le bouton -->
+                <!-- ✅ Vérification avant d'afficher le bouton -->
                 {% if post.user != request.user and not post.has_reviews and not post.has_user_review %}
                     <div class="mt-4 flex justify-end">
                         <button onclick="toggleReviewForm('review-container-{{ post.id }}', 'review-button-{{ post.id }}')"
                                 id="review-button-{{ post.id }}"
-                                class="mt-2 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                                class="mt-2 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                                aria-label="Ajouter une critique pour le ticket {{ post.title }}"
+                                aria-expanded="false"
+                                tabindex="0"
+                                onkeydown="if (event.key === 'Enter') toggleReviewForm('review-container-{{ post.id }}', 'review-button-{{ post.id }}')">
                             Ajouter une critique
                         </button>
                     </div>
 
-                    <!-- 🔹 Conteneur du formulaire de critique (caché par défaut) -->
-                    <div id="review-container-{{ post.id }}" class="hidden mt-4">
+                    <!-- ✅ Conteneur du formulaire de critique avec `aria-hidden` pour l’accessibilité -->
+                    <div id="review-container-{{ post.id }}" class="hidden mt-4" aria-hidden="true">
                         {% include "new_review_form.html" with edit_mode=True new=True ticket_id=post.id review_form_id="review-form-"|add:post.id %}
                     </div>
                 {% endif %}
@@ -65,7 +76,7 @@
     {% endfor %}
 </div>
 
-<!-- ✅ JavaScript -->
+<!-- ✅ JavaScript optimisé pour l’accessibilité -->
 <script>
     function toggleReviewForm(containerId, buttonId) {
         const reviewContainer = document.getElementById(containerId);
@@ -73,16 +84,19 @@
 
         if (reviewContainer.classList.contains("hidden")) {
             reviewContainer.classList.remove("hidden");
+            reviewContainer.setAttribute("aria-hidden", "false");
+            toggleButton.setAttribute("aria-expanded", "true");
             toggleButton.textContent = "Fermer";
             toggleButton.classList.remove("bg-blue-500");
             toggleButton.classList.add("bg-red-500");
         } else {
             reviewContainer.classList.add("hidden");
+            reviewContainer.setAttribute("aria-hidden", "true");
+            toggleButton.setAttribute("aria-expanded", "false");
             toggleButton.textContent = "Ajouter une critique";
             toggleButton.classList.remove("bg-red-500");
             toggleButton.classList.add("bg-blue-500");
         }
     }
 </script>
-
 {% endblock %}

@@ -1,5 +1,10 @@
 from django.db import models
-from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import (
+    MinLengthValidator,
+    RegexValidator,
+    MinValueValidator,
+    MaxValueValidator,
+)
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
@@ -18,8 +23,7 @@ class User(AbstractBaseUser):
     """Modèle utilisateur sans email"""
 
     username = models.CharField(
-        max_length=150,
-        unique=True  # Vérification dans la base de données
+        max_length=150, unique=True  # Vérification dans la base de données
     )
 
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -44,11 +48,13 @@ from django.conf import settings
 class Ticket(models.Model):
     """Modèle pour une demande de critique"""
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets")
-    title = models.CharField( max_length=128,error_messages={
-            "blank": "Le titre est obligatoire."
-        })
-    description = models.TextField(max_length=2048,blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets"
+    )
+    title = models.CharField(
+        max_length=128, error_messages={"blank": "Le titre est obligatoire."}
+    )
+    description = models.TextField(max_length=2048, blank=True)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -59,36 +65,37 @@ class Ticket(models.Model):
 class Review(models.Model):
     """Modèle pour une critique (review) d'un livre ou d'un article."""
 
-    ticket = models.ForeignKey("Ticket", on_delete=models.CASCADE, related_name="reviews")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
+    ticket = models.ForeignKey(
+        "Ticket", on_delete=models.CASCADE, related_name="reviews"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews"
+    )
 
-    rating = models.PositiveSmallIntegerField( blank=True,
-        validators=[MinValueValidator(0), MaxValueValidator(5)])
+    rating = models.PositiveSmallIntegerField(
+        blank=True, validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
 
-    headline = models.CharField(max_length=128, error_messages={
-            "blank": "Le titre est obligatoire."
-        })
+    headline = models.CharField(
+        max_length=128, error_messages={"blank": "Le titre est obligatoire."}
+    )
     body = models.TextField(max_length=8192, blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Critique de {self.user.username} sur {self.ticket.title} - {self.rating}⭐"
 
+
 class UserFollows(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="following"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="following"
     )
     followed_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="followed_by"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="followed_by"
     )
 
     class Meta:
-        unique_together = ('user', 'followed_user')
+        unique_together = ("user", "followed_user")
 
     def __str__(self):
         return f"{self.user.username} suit {self.followed_user.username}"
-

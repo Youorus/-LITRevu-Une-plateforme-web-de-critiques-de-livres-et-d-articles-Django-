@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('listings', '0007_alter_review_rating'),
+        ("listings", "0007_alter_review_rating"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='review',
-            name='headline',
-            field=models.CharField(error_messages={'blank': 'Le titre est obligatoire.'}, max_length=128),
+            model_name="review",
+            name="headline",
+            field=models.CharField(
+                error_messages={"blank": "Le titre est obligatoire."}, max_length=128
+            ),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='title',
-            field=models.CharField(error_messages={'blank': 'Le titre est obligatoire.'}, max_length=128),
+            model_name="ticket",
+            name="title",
+            field=models.CharField(
+                error_messages={"blank": "Le titre est obligatoire."}, max_length=128
+            ),
         ),
     ]

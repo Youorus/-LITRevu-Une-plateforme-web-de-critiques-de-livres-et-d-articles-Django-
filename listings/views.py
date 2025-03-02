@@ -13,29 +13,37 @@ from listings.models import Ticket, Review, User, UserFollows
 def index(request):
     """Page d'accueil qui affiche le formulaire de connexion si l'utilisateur n'est pas connecté"""
     if request.user.is_authenticated:
-        print("Utilisateur connecté, redirection vers /flux/")  # Ajoute ce log
-        return redirect("flux")  # Redirige vers /flux si connecté
+        return redirect("flux")  # Redirige vers /flux si déjà connecté
+
+    errors = {}  # Dictionnaire pour stocker les erreurs des champs individuels
 
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
-            print(f"Connexion réussie : {user.username}, redirection vers /flux/")  # Debugging
-            return redirect("flux")
+        # Vérifie si l'utilisateur existe
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            errors["username"] = "Ce nom d'utilisateur n'existe pas."
         else:
-            messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
+            # Authentifie l'utilisateur
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("flux")
+            else:
+                errors["password"] = "Mot de passe incorrect."
 
-    return render(request, "index.html")
+    return render(request, "index.html", {"errors": errors})
 
 
 
 def register(request):
     """Gère l'inscription des utilisateurs avec affichage des erreurs"""
     if request.user.is_authenticated:
-        return redirect("flux")  # Empêche un utilisateur connecté d'accéder à l'inscription
+        return redirect(
+            "flux"
+        )  # Empêche un utilisateur connecté d'accéder à l'inscription
 
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
@@ -80,9 +88,7 @@ def new_ticket(request):
     else:
         form = TicketForm()
 
-    return render(request, "new_ticket.html", {
-        "form": form
-    })
+    return render(request, "new_ticket.html", {"form": form})
 
 
 @login_required(login_url="/")
@@ -117,10 +123,8 @@ def new_review(request, ticket_id=None):
     else:
         form = ReviewForm()
 
-    return render(request, "new_review.html", {
-        "form": form,
-        "ticket": ticket
-    })
+    return render(request, "new_review.html", {"form": form, "ticket": ticket})
+
 
 @login_required
 def create_ticket_and_review(request):
@@ -143,7 +147,9 @@ def create_ticket_and_review(request):
             review.user = request.user
             review.save()
 
-            messages.success(request, "Votre ticket et votre critique ont été publiés avec succès !")
+            messages.success(
+                request, "Votre ticket et votre critique ont été publiés avec succès !"
+            )
             return redirect("flux")  # ✅ Redirige vers le flux après soumission
 
         else:
@@ -153,20 +159,31 @@ def create_ticket_and_review(request):
         ticket_form = TicketForm()
         review_form = ReviewForm()
 
-    return render(request, "new_ticket_and_review.html", {
-        "ticket_form": ticket_form,
-        "review_form": review_form,
-        "edit_mode": True,
-    })
+    return render(
+        request,
+        "new_ticket_and_review.html",
+        {
+            "ticket_form": ticket_form,
+            "review_form": review_form,
+            "edit_mode": True,
+        },
+    )
 
 
 def posts(request):
     """Récupère les tickets de l'utilisateur actuel et les envoie à la vue"""
-    user_tickets = Ticket.objects.filter(user=request.user).order_by("-created_at")  # Tri par date décroissante
+    user_tickets = Ticket.objects.filter(user=request.user).order_by(
+        "-created_at"
+    )  # Tri par date décroissante
     """Récupère et affiche les critiques de l'utilisateur connecté"""
-    reviews = Review.objects.filter(user=request.user).order_by("-time_created")  # Trier par date descendante
+    reviews = Review.objects.filter(user=request.user).order_by(
+        "-time_created"
+    )  # Trier par date descendante
 
-    return render(request, "posts.html", {"user_tickets": user_tickets, "reviews": reviews})
+    return render(
+        request, "posts.html", {"user_tickets": user_tickets, "reviews": reviews}
+    )
+
 
 @login_required(login_url="/")
 def edit_ticket(request, ticket_id):
@@ -178,17 +195,24 @@ def edit_ticket(request, ticket_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Votre ticket a été mis à jour avec succès !")
-            return redirect("posts")  # Redirige vers la liste des posts après modification
+            return redirect(
+                "posts"
+            )  # Redirige vers la liste des posts après modification
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
         form = TicketForm(instance=ticket)
 
-    return render(request, "edit_ticket.html", {
-        "form": form,
-        "edit_mode": True,  # Mode édition
-        "ticket": ticket  # On passe le ticket existant
-    })
+    return render(
+        request,
+        "edit_ticket.html",
+        {
+            "form": form,
+            "edit_mode": True,  # Mode édition
+            "ticket": ticket,  # On passe le ticket existant
+        },
+    )
+
 
 @login_required(login_url="/")
 def edit_review(request, review_id):
@@ -208,24 +232,37 @@ def edit_review(request, review_id):
     else:
         form = ReviewForm(instance=review)
 
-    return render(request, "edit_review.html", {
-        "form": form,
-        "ticket": ticket,  # On envoie le ticket à la template pour l'afficher
-        "review": review,
-        "edit_mode": True,  # Indicateur pour l'affichage dynamique
-    })
+    return render(
+        request,
+        "edit_review.html",
+        {
+            "form": form,
+            "ticket": ticket,  # On envoie le ticket à la template pour l'afficher
+            "review": review,
+            "edit_mode": True,  # Indicateur pour l'affichage dynamique
+        },
+    )
+
 
 @login_required
 def follow_view(request):
     """Affiche les abonnés, abonnements et permet de rechercher des utilisateurs"""
-    query = request.GET.get('search', '')
+    query = request.GET.get("search", "")
 
     # Récupère les abonnements et abonnés de l'utilisateur connecté
-    following = UserFollows.objects.filter(user=request.user).select_related("followed_user")
-    followers = UserFollows.objects.filter(followed_user=request.user).select_related("user")
+    following = UserFollows.objects.filter(user=request.user).select_related(
+        "followed_user"
+    )
+    followers = UserFollows.objects.filter(followed_user=request.user).select_related(
+        "user"
+    )
 
     # Recherche d'un utilisateur
-    search_results = User.objects.exclude(id=request.user.id).filter(username__icontains=query) if query else []
+    search_results = (
+        User.objects.exclude(id=request.user.id).filter(username__icontains=query)
+        if query
+        else []
+    )
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -233,21 +270,28 @@ def follow_view(request):
         target_user = get_object_or_404(User, id=user_id)
 
         if action == "follow":
-            UserFollows.objects.get_or_create(user=request.user, followed_user=target_user)
+            UserFollows.objects.get_or_create(
+                user=request.user, followed_user=target_user
+            )
             messages.success(request, f"Vous suivez maintenant {target_user.username}.")
         elif action == "unfollow":
-            UserFollows.objects.filter(user=request.user, followed_user=target_user).delete()
+            UserFollows.objects.filter(
+                user=request.user, followed_user=target_user
+            ).delete()
             messages.success(request, f"Vous ne suivez plus {target_user.username}.")
 
         return redirect("follow_view")
 
-    return render(request, "follow.html", {
-        "following": following,
-        "followers": followers,
-        "search_results": search_results,
-        "query": query
-    })
-
+    return render(
+        request,
+        "follow.html",
+        {
+            "following": following,
+            "followers": followers,
+            "search_results": search_results,
+            "query": query,
+        },
+    )
 
 
 @login_required
@@ -261,30 +305,38 @@ def flux(request):
     user = request.user
 
     # 🔹 Récupérer les utilisateurs suivis
-    followed_users = UserFollows.objects.filter(user=user).values_list("followed_user", flat=True)
+    followed_users = UserFollows.objects.filter(user=user).values_list(
+        "followed_user", flat=True
+    )
 
     # 🔹 Récupérer toutes les critiques visibles par l'utilisateur
     reviews = Review.objects.filter(
-        Q(user__in=followed_users) |  # Critiques des utilisateurs suivis
-        Q(user=user) |  # Critiques de l'utilisateur connecté
-        Q(ticket__user=user)  # Critiques en réponse aux billets de l'utilisateur connecté
-    ).annotate(content_type=Value('REVIEW', output_field=CharField()))
+        Q(user__in=followed_users)  # Critiques des utilisateurs suivis
+        | Q(user=user)  # Critiques de l'utilisateur connecté
+        | Q(
+            ticket__user=user
+        )  # Critiques en réponse aux billets de l'utilisateur connecté
+    ).annotate(content_type=Value("REVIEW", output_field=CharField()))
 
     # ✅ Récupérer uniquement les tickets **qui n'ont pas encore de critiques affichées**
     tickets_with_reviews = reviews.values_list("ticket_id", flat=True)
 
     tickets = Ticket.objects.filter(
-        Q(user__in=followed_users) |  # Billets des utilisateurs suivis
-        Q(user=user)  # Billets de l'utilisateur connecté
-    ).exclude(id__in=tickets_with_reviews)  # ✅ Exclure les tickets qui ont déjà une critique
+        Q(user__in=followed_users)  # Billets des utilisateurs suivis
+        | Q(user=user)  # Billets de l'utilisateur connecté
+    ).exclude(
+        id__in=tickets_with_reviews
+    )  # ✅ Exclure les tickets qui ont déjà une critique
 
-    tickets = tickets.annotate(content_type=Value('TICKET', output_field=CharField()))
+    tickets = tickets.annotate(content_type=Value("TICKET", output_field=CharField()))
 
     # 🔹 Fusionner billets et critiques, triés du plus récent au plus ancien
     posts = sorted(
         chain(reviews, tickets),
-        key=lambda post: getattr(post, 'time_created', getattr(post, 'created_at', None)),
-        reverse=True
+        key=lambda post: getattr(
+            post, "time_created", getattr(post, "created_at", None)
+        ),
+        reverse=True,
     )
 
     return render(request, "flux.html", {"posts": posts})
@@ -306,5 +358,3 @@ def delete_review(request, review_id):
     review.delete()
     messages.success(request, "Votre critique a été supprimée avec succès !")
     return redirect("posts")
-
-
