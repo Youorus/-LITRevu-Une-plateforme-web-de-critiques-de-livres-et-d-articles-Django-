@@ -168,7 +168,7 @@ def create_ticket_and_review(request):
         },
     )
 
-
+@login_required
 def posts(request):
     """Récupère les tickets de l'utilisateur actuel et les envoie à la vue"""
     user_tickets = Ticket.objects.filter(user=request.user).order_by(
@@ -246,21 +246,16 @@ def edit_review(request, review_id):
 @login_required
 def follow_view(request):
     """Affiche les abonnés, abonnements et permet de rechercher des utilisateurs"""
-    query = request.GET.get("search", "")
+    query = request.GET.get("search", "").strip()
 
-    # Récupère les abonnements et abonnés de l'utilisateur connecté
-    following = UserFollows.objects.filter(user=request.user).select_related(
-        "followed_user"
-    )
-    followers = UserFollows.objects.filter(followed_user=request.user).select_related(
-        "user"
-    )
+    following = UserFollows.objects.filter(user=request.user).select_related("followed_user")
+    followers = UserFollows.objects.filter(followed_user=request.user).select_related("user")
 
-    # Recherche d'un utilisateur
+    # Recherche optimisée
     search_results = (
-        User.objects.exclude(id=request.user.id).filter(username__icontains=query)
-        if query
-        else []
+        User.objects.exclude(id=request.user.id)
+        .filter(username__icontains=query)
+        if query else User.objects.none()
     )
 
     if request.method == "POST":
@@ -269,17 +264,16 @@ def follow_view(request):
         target_user = get_object_or_404(User, id=user_id)
 
         if action == "follow":
-            UserFollows.objects.get_or_create(
-                user=request.user, followed_user=target_user
-            )
-            messages.success(request, f"Vous suivez maintenant {target_user.username}.")
+            if not UserFollows.objects.filter(user=request.user, followed_user=target_user).exists():
+                UserFollows.objects.create(user=request.user, followed_user=target_user)
+                messages.success(request, f"Vous suivez maintenant {target_user.username}.")
+            else:
+                messages.info(request, f"Vous suivez déjà {target_user.username}.")
         elif action == "unfollow":
-            UserFollows.objects.filter(
-                user=request.user, followed_user=target_user
-            ).delete()
+            UserFollows.objects.filter(user=request.user, followed_user=target_user).delete()
             messages.success(request, f"Vous ne suivez plus {target_user.username}.")
 
-        return redirect("follow_view")
+        return redirect(request.path)  # Redirection vers la même page
 
     return render(
         request,
@@ -291,6 +285,7 @@ def follow_view(request):
             "query": query,
         },
     )
+
 
 
 @login_required
@@ -357,3 +352,7 @@ def delete_review(request, review_id):
     review.delete()
     messages.success(request, "Votre critique a été supprimée avec succès !")
     return redirect("posts")
+
+def custom_404_view(request, exception):
+    """Affiche une page personnalisée pour les erreurs 404"""
+    return render(request, '404.html', status=404)

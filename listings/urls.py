@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from listings.views import custom_404_view
 
 from listings.views import (
     create_ticket_and_review,
@@ -39,6 +40,9 @@ urlpatterns = [
     path("ticket/delete/<int:ticket_id>/", delete_ticket, name="delete_ticket"),
     path("review/delete/<int:review_id>/", delete_review, name="delete_review"),
 ]
+
+handler404 = 'listings.views.custom_404_view'
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,5 +1,5 @@
 {% load static %}
-<form id="{{ review_form_id|default:'review-form' }}" method="post" action="{% url 'new_review_ticket' ticket_id %}" class="mt-6 space-y-4">
+<form id="{{ review_form_id|default:'review-form' }}" method="post"  class="mt-6 space-y-4">
     {% csrf_token %}
 
     <!-- Champ caché pour stocker l'ID du ticket -->
