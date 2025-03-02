@@ -16,7 +16,8 @@ urlpatterns = [
     path("ticket/edit/<int:ticket_id>/", edit_ticket, name="edit_ticket"),
     path("review/edit/<int:review_id>/", edit_review, name="edit_review"),
     path("follow/", follow_view, name="follow_view"),
-
+    path('flux/', flux, name='flux'),
+    path('review/new/<int:ticket_id>/', new_review, name='new_review_ticket'),
 ]
 
 if settings.DEBUG:

@@ -1,8 +1,11 @@
+from itertools import chain
+from django.db.models import Value, CharField, Q, Exists, OuterRef
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
+from listings import models
 from listings.forms import UserRegistrationForm, TicketForm, ReviewForm
 from listings.models import Ticket, Review, User, UserFollows
 
@@ -83,38 +86,51 @@ def new_ticket(request):
 
 
 @login_required(login_url="/")
-def new_review(request):
-    """Vue pour créer une critique d'un ticket existant"""
+def new_review(request, ticket_id=None):
+    """
+    Vue pour créer une critique d'un ticket existant ou sans ticket.
 
+    - Si `ticket_id` est fourni, la critique est associée à un ticket spécifique.
+    - Sinon, l'utilisateur peut écrire une critique librement.
+    """
+
+    ticket = None
+    if ticket_id:
+        ticket = get_object_or_404(Ticket, id=ticket_id)
 
     if request.method == "POST":
         form = ReviewForm(request.POST)
+        print(form)
         if form.is_valid():
             review = form.save(commit=False)
-            # review.ticket = ticket
-            review.user = request.user
+            review.user = request.user  # Associe la critique à l'utilisateur connecté
+            if ticket:
+                review.ticket = ticket  # Associe la critique au ticket si fourni
             review.save()
+
             messages.success(request, "Votre critique a été ajoutée avec succès !")
+
+            # 🔹 Redirige vers la section du ticket après soumission
             return redirect("flux")
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
         form = ReviewForm()
 
-    return render(request, "new_review.html", {"form": form})
+    return render(request, "new_review.html", {
+        "form": form,
+        "ticket": ticket
+    })
 
-
-@login_required(login_url="/")
+@login_required
 def create_ticket_and_review(request):
-    """Vue pour créer un ticket et une critique en même temps sans JavaScript"""
+    """Vue pour créer un ticket et une critique en même temps"""
 
     if request.method == "POST":
         ticket_form = TicketForm(request.POST, request.FILES)
         review_form = ReviewForm(request.POST)
-        print(f"📩 Données passées au ReviewForm : {review_form.data}")
-
-        print(f"📩 Données reçues dans request.POST : {request.POST}")
-
+        if ticket_form.is_valid() and review_form.is_valid():
+            print("✅ Formulaires valides ! Enregistrement en base...")
         if ticket_form.is_valid() and review_form.is_valid():
             # Enregistrer le ticket
             ticket = ticket_form.save(commit=False)
@@ -123,24 +139,26 @@ def create_ticket_and_review(request):
 
             # Enregistrer la critique associée au ticket
             review = review_form.save(commit=False)
-            review.ticket = ticket
+            review.ticket = ticket  # Associer la critique au ticket créé
             review.user = request.user
             review.save()
 
             messages.success(request, "Votre ticket et votre critique ont été publiés avec succès !")
-            return redirect("flux")  # Redirige vers la page d'accueil
+            return redirect("flux")  # ✅ Redirige vers le flux après soumission
+
         else:
-            print(review_form.errors)
+            messages.error(request, "Veuillez corriger les erreurs des formulaires.")
 
     else:
         ticket_form = TicketForm()
         review_form = ReviewForm()
+
     return render(request, "new_ticket_and_review.html", {
         "ticket_form": ticket_form,
         "review_form": review_form,
         "edit_mode": True,
-
     })
+
 
 def posts(request):
     """Récupère les tickets de l'utilisateur actuel et les envoie à la vue"""
@@ -229,3 +247,47 @@ def follow_view(request):
         "search_results": search_results,
         "query": query
     })
+
+
+
+@login_required
+def flux(request):
+    """
+    Affiche le flux d'activité de l'utilisateur connecté avec :
+    - Les billets et avis des utilisateurs suivis
+    - Les billets et avis de l'utilisateur connecté
+    - Les avis en réponse aux billets de l'utilisateur connecté
+    """
+    user = request.user
+
+    # 🔹 Récupérer les utilisateurs suivis
+    followed_users = UserFollows.objects.filter(user=user).values_list("followed_user", flat=True)
+
+    # 🔹 Récupérer toutes les critiques visibles par l'utilisateur
+    reviews = Review.objects.filter(
+        Q(user__in=followed_users) |  # Critiques des utilisateurs suivis
+        Q(user=user) |  # Critiques de l'utilisateur connecté
+        Q(ticket__user=user)  # Critiques en réponse aux billets de l'utilisateur connecté
+    ).annotate(content_type=Value('REVIEW', output_field=CharField()))
+
+    # ✅ Récupérer uniquement les tickets **qui n'ont pas encore de critiques affichées**
+    tickets_with_reviews = reviews.values_list("ticket_id", flat=True)
+
+    tickets = Ticket.objects.filter(
+        Q(user__in=followed_users) |  # Billets des utilisateurs suivis
+        Q(user=user)  # Billets de l'utilisateur connecté
+    ).exclude(id__in=tickets_with_reviews)  # ✅ Exclure les tickets qui ont déjà une critique
+
+    tickets = tickets.annotate(content_type=Value('TICKET', output_field=CharField()))
+
+    # 🔹 Fusionner billets et critiques, triés du plus récent au plus ancien
+    posts = sorted(
+        chain(reviews, tickets),
+        key=lambda post: getattr(post, 'time_created', getattr(post, 'created_at', None)),
+        reverse=True
+    )
+
+    return render(request, "flux.html", {"posts": posts})
+
+
+

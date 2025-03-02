@@ -89,8 +89,6 @@ class TicketForm(forms.ModelForm):
             raise forms.ValidationError("Le titre doit contenir au moins 3 caractères.")
         if len(title) > 128:
             raise forms.ValidationError("Le titre ne peut pas dépasser 128 caractères.")
-        if Ticket.objects.filter(title=title).exists():
-            raise forms.ValidationError("Un ticket avec ce titre existe déjà.")
         return title
 
     def clean_description(self):

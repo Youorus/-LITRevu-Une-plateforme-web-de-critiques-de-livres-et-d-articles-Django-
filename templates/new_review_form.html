@@ -1,45 +1,51 @@
 {% load static %}
-<form id="review-form" method="post" class="mt-6 space-y-4">
+<form id="{{ review_form_id|default:'review-form' }}" method="post" action="{% url 'new_review_ticket' ticket_id %}" class="mt-6 space-y-4">
     {% csrf_token %}
+
+    <!-- Champ caché pour stocker l'ID du ticket -->
+    {% if ticket_id %}
+        <input type="hidden" name="ticket_id" value="{{ ticket_id }}">
+    {% endif %}
 
     <!-- Champ Titre de la Critique -->
     <div>
         <input type="text" required placeholder="Titre" name="headline" id="id_headline"
-       value="{{ form.headline.value|default_if_none:'' }}"
-       class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+               value="{{ form.headline.value|default_if_none:'' }}"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-{% if form.headline.errors %}
-    <p class="text-red-500 text-sm mt-1">{{ form.headline.errors.0 }}</p>
-{% endif %}
+        {% if form.headline.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.headline.errors.0 }}</p>
+        {% endif %}
     </div>
 
     <!-- Inclusion du système d'étoiles -->
-    {% if edit_mode %}
-        {% include "rating.html" with rating_input_id="rating-input" rating=review.rating edit_mode=True %}
-    {% else %}
-        {% include "rating.html" with rating_input_id="rating-input" %}
-    {% endif %}
+    <div class="mt-4">
+        {% include "rating.html" with rating_input_id="rating-input" rating=review.rating edit_mode=edit_mode %}
+    </div>
 
     <!-- Champ Critique -->
     <div>
-     <textarea name="{{ form.body.name }}" rows="4" placeholder="Votre Opinion"  id="id_body"
-              class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.body.value|default_if_none:'' }}</textarea>
-     {% if form.body.errors %}
-    <p class="text-red-500 text-sm mt-1">{{ form.body.errors.0 }}</p>
-{% endif %}
+        <textarea name="body" rows="4" placeholder="Votre Opinion" id="id_body"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.body.value|default_if_none:'' }}</textarea>
+
+        {% if form.body.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.body.errors.0 }}</p>
+        {% endif %}
     </div>
 
     <!-- 🟢 Bouton dynamique -->
     {% if not hide_submit %}
-    <div class="flex justify-center">
-        <button type="submit"
-                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition transform duration-300">
-            {% if edit_mode %}
-                Mettre à jour la critique
-            {% else %}
-                Publier la critique
-            {% endif %}
-        </button>
-    </div>
+        <div class="flex justify-center">
+            <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition duration-300">
+                {% if new %}
+                    Ajouter
+                {% elif edit_mode %}
+                    Mettre à jour la critique
+                {% else %}
+                    Publier la critique
+                {% endif %}
+            </button>
+        </div>
     {% endif %}
 </form>
