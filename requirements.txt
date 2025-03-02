@@ -1,5 +1,5 @@
-asgiref==3.8.1
-Django==4.2.19
-pillow==11.1.0
-sqlparse==0.5.3
-typing_extensions==4.12.2
+asgiref==3.8.1  # Nécessaire pour Django et ASGI
+Django==4.2.19  # Framework Django
+pillow==11.1.0  # Gestion des images dans Django (si tu utilises ImageField)
+sqlparse==0.5.3  # Utilisé par Django pour analyser SQL
+typing_extensions==4.12.2  # Utilisé par Django et autres packages pour les annotations

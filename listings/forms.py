@@ -1,7 +1,9 @@
+import re
+
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import User, Ticket, Review
-import re
+
+from .models import Review, Ticket, User
 
 
 class UserRegistrationForm(forms.ModelForm):

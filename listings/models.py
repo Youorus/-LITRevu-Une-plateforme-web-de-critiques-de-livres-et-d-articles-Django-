@@ -1,11 +1,6 @@
-from django.db import models
-from django.core.validators import (
-    MinLengthValidator,
-    RegexValidator,
-    MinValueValidator,
-    MaxValueValidator,
-)
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
@@ -41,8 +36,8 @@ class User(AbstractBaseUser):
         return self.username
 
 
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 
 class Ticket(models.Model):

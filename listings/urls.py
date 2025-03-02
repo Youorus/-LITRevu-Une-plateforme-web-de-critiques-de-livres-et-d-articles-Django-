@@ -1,20 +1,21 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+
 from listings.views import (
-    index,
-    register,
-    flux,
-    logout_view,
-    new_ticket,
-    new_review,
     create_ticket_and_review,
-    posts,
-    edit_ticket,
-    edit_review,
-    follow_view,
-    delete_ticket,
     delete_review,
+    delete_ticket,
+    edit_review,
+    edit_ticket,
+    flux,
+    follow_view,
+    index,
+    logout_view,
+    new_review,
+    new_ticket,
+    posts,
+    register,
 )
 
 urlpatterns = [

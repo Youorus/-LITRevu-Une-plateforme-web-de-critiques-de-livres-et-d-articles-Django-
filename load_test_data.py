@@ -1,13 +1,20 @@
 import os
-import django
 import random
 
+import django
+
 # ✅ Configuration Django AVANT les imports de modèles
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "LITRevuProject.settings")  # Remplace par le bon nom
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "LITRevuProject.settings"
+)  # Remplace par le bon nom
 django.setup()
 
 from django.contrib.auth import get_user_model
-from listings.models import Ticket, Review  # Remplace "listings" par ton application réelle
+
+from listings.models import (  # Remplace "listings" par ton application réelle
+    Review,
+    Ticket,
+)
 
 # ✅ Données réalistes pour les tests
 USERNAMES = ["alice", "bob", "charlie", "diana", "emma", "frank", "george", "hannah"]
@@ -57,6 +64,7 @@ REVIEW_BODIES = [
     "Certaines fonctionnalités sont absentes mais ça reste correct.",
 ]
 
+
 def load_test_data():
     """Ajoute des données de test SANS supprimer les anciennes."""
     print("🚀 Chargement des données de test...")
@@ -81,7 +89,9 @@ def load_test_data():
 
         # Vérifie si un ticket avec ce titre existe déjà
         if not Ticket.objects.filter(title=title, user=user).exists():
-            ticket = Ticket.objects.create(title=title, description=description, user=user)
+            ticket = Ticket.objects.create(
+                title=title, description=description, user=user
+            )
             print(f"🎫 Ticket ajouté : {title} (par {user.username})")
 
     # ✅ Ajouter des critiques de test (avec un Ticket obligatoire)
@@ -100,10 +110,11 @@ def load_test_data():
                 body=body,
                 rating=rating,
                 user=user,
-                ticket=ticket  # 🔴 Ajoute un Ticket obligatoire ici
+                ticket=ticket,  # 🔴 Ajoute un Ticket obligatoire ici
             )
             print(
-                f"⭐ Critique ajoutée : {headline} (Note: {rating}/5 par {user.username}, pour le ticket '{ticket.title}')")
+                f"⭐ Critique ajoutée : {headline} (Note: {rating}/5 par {user.username}, pour le ticket '{ticket.title}')"
+            )
         else:
             print("❌ Aucune critique ajoutée car aucun ticket disponible.")
 

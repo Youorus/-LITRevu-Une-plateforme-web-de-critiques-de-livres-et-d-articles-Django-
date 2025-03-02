@@ -1,13 +1,13 @@
 from itertools import chain
-from django.db.models import Value, CharField, Q, Exists, OuterRef
-from django.contrib import messages
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
 
-from listings import models
-from listings.forms import UserRegistrationForm, TicketForm, ReviewForm
-from listings.models import Ticket, Review, User, UserFollows
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.db.models import CharField, Q, Value
+from django.shortcuts import get_object_or_404, redirect, render
+
+from listings.forms import ReviewForm, TicketForm, UserRegistrationForm
+from listings.models import Review, Ticket, User, UserFollows
 
 
 def index(request):
@@ -35,7 +35,6 @@ def index(request):
                 errors["password"] = "Mot de passe incorrect."
 
     return render(request, "index.html", {"errors": errors})
-
 
 
 def register(request):
