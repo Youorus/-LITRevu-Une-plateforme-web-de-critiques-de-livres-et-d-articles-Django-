@@ -290,4 +290,21 @@ def flux(request):
     return render(request, "flux.html", {"posts": posts})
 
 
+@login_required
+def delete_ticket(request, ticket_id):
+    """Supprime un ticket"""
+    ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
+    ticket.delete()
+    messages.success(request, "Votre ticket a été supprimé avec succès !")
+    return redirect("posts")
+
+
+@login_required
+def delete_review(request, review_id):
+    """Supprime une critique"""
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    review.delete()
+    messages.success(request, "Votre critique a été supprimée avec succès !")
+    return redirect("posts")
+
 

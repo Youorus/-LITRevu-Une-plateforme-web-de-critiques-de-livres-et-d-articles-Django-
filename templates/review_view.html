@@ -30,17 +30,29 @@
     <div class="mt-4 border-t pt-4">
         {% include "ticket_view.html" with ticket=review.ticket %}
     </div>
+<!-- Boutons d'action pour la critique -->
 {% if type == "user_review" %}
 <div class="mt-4 flex justify-end space-x-4">
-        <a href="{% url 'edit_review' review.id %} "
-           class="text-blue-600 font-medium hover:underline">
-            Modifier
-        </a>
+    <a href="{% url 'edit_review' review.id %}" class="text-blue-600 font-medium hover:underline">
+        Modifier
+    </a>
+    <button onclick="openModal('deleteReviewModal{{ review.id }}')"
+            class="text-red-600 font-medium hover:underline">
+        Supprimer
+    </button>
+</div>
 
-            <a href=""
-               class="text-red-600 font-medium hover:underline">
-                Supprimer
-            </a>
+<!-- Modal de confirmation pour la suppression de la critique -->
+<div id="deleteReviewModal{{ review.id }}" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-lg font-semibold mb-4">Confirmer la suppression</h2>
+        <p>Voulez-vous vraiment supprimer cette critique ? Cette action est irréversible.</p>
+        <div class="mt-4 flex justify-end space-x-4">
+            <button onclick="closeModal('deleteReviewModal{{ review.id }}')" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Annuler</button>
+            <a href="{% url 'delete_review' review.id %}" class="px-4 py-2 bg-red-600 text-white rounded-lg">Supprimer</a>
+        </div>
     </div>
-  {% endif %}
+</div>
+{% endif %}
+
 </div>
